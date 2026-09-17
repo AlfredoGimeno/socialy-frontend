@@ -1,0 +1,192 @@
+<div class="dashboard-page">
+
+  <header class="dashboard-header">
+
+    <div>
+
+      <span class="brand">
+        Socialy
+      </span>
+
+      <h1>
+        {{ title }}
+      </h1>
+
+    </div>
+
+    <button
+      type="button"
+      class="logout-button"
+      (click)="logout()"
+    >
+      Cerrar sesión
+    </button>
+
+  </header>
+
+  <main class="dashboard-content">
+
+    @if (session(); as currentSession) {
+
+      <section class="card">
+
+        <h2>
+          Sesión iniciada correctamente
+        </h2>
+
+        <div class="information-grid">
+
+          <div>
+            <span class="label">
+              Usuario
+            </span>
+
+            <strong>
+              {{ currentSession.name }}
+              {{ currentSession.surname }}
+            </strong>
+          </div>
+
+          <div>
+            <span class="label">
+              Email
+            </span>
+
+            <strong>
+              {{ currentSession.email }}
+            </strong>
+          </div>
+
+          <div>
+            <span class="label">
+              Rol
+            </span>
+
+            <strong>
+              {{ currentSession.role }}
+            </strong>
+          </div>
+
+          <div>
+            <span class="label">
+              ID usuario
+            </span>
+
+            <strong>
+              {{ currentSession.userId }}
+            </strong>
+          </div>
+
+        </div>
+
+        @if (
+          currentSession.role ===
+          'ORGANIZATION'
+        ) {
+
+          <hr>
+
+          <div class="information-grid">
+
+            <div>
+
+              <span class="label">
+                Organización
+              </span>
+
+              <strong>
+                {{
+                  currentSession.organizationName
+                }}
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span class="label">
+                Verificada
+              </span>
+
+              <strong>
+                {{
+                  currentSession.organizationVerified
+                    ? 'Sí'
+                    : 'No'
+                }}
+              </strong>
+
+            </div>
+
+          </div>
+
+        }
+
+      </section>
+
+    }
+
+    <section class="card">
+
+      <h2>
+        Prueba del JWT
+      </h2>
+
+      <p>
+        Este bloque obtiene los datos mediante
+        <code>GET /api/users/me</code>.
+      </p>
+
+      @if (loadingProfile()) {
+
+        <p>
+          Cargando usuario desde el backend...
+        </p>
+
+      } @else if (profile(); as user) {
+
+        <div class="success-message">
+          JWT validado correctamente por Spring Boot.
+        </div>
+
+        <div class="information-grid">
+
+          <div>
+
+            <span class="label">
+              ID recibido del backend
+            </span>
+
+            <strong>
+              {{ user.id }}
+            </strong>
+
+          </div>
+
+          <div>
+
+            <span class="label">
+              Usuario activo
+            </span>
+
+            <strong>
+              {{ user.active ? 'Sí' : 'No' }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      } @else if (profileError()) {
+
+        <div class="error-message">
+          {{ profileError() }}
+        </div>
+
+      }
+
+    </section>
+
+  </main>
+
+</div>

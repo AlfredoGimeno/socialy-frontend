@@ -1,0 +1,5 @@
+export enum UserRole {
+  VOLUNTEER = 'VOLUNTEER',
+  ORGANIZATION = 'ORGANIZATION',
+  ADMIN = 'ADMIN'
+}
