@@ -1,7 +1,7 @@
 import {Component,inject,signal} from '@angular/core';
 import {ReactiveFormsModule,FormBuilder,Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
-import {Router} from '@angular/router';
+import {Router,RouterLink} from '@angular/router';
 import {finalize} from 'rxjs';
 import {AuthService} from '../../../core/auth/services/auth.service';
 import {LoginRequest} from '../../../core/auth/models/login-request';
@@ -9,11 +9,15 @@ import {getHomeRoute} from '../../../core/auth/utils/role-home';
 
 @Component({
   selector: 'app-login',
+
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterLink
   ],
-  templateUrl: './login.html',
-  styleUrl: './login.scss'
+
+  templateUrl:'./login.html',
+
+  styleUrl:'./login.scss'
 })
 export class Login {
 
@@ -70,9 +74,7 @@ export class Login {
 
     this.loading.set(true);
 
-    const request:
-      LoginRequest =
-      this.form.getRawValue();
+    const request:LoginRequest = this.form.getRawValue();
 
     this.authService
       .login(request)
@@ -84,19 +86,16 @@ export class Login {
 
       )
       .subscribe({
-
         next: response => {
-
-          void this.router.navigateByUrl(
-            getHomeRoute(
-              response.role
-            )
-          );
+          void this.router
+            .navigateByUrl(
+              getHomeRoute(
+                response.role
+              )
+            );
         },
 
-        error: (
-          error: HttpErrorResponse
-        ) => {
+        error: (error: HttpErrorResponse) => {
 
           this.errorMessage.set(
             this.getErrorMessage(
@@ -108,26 +107,38 @@ export class Login {
       });
   }
 
-  private getErrorMessage(
-    error: HttpErrorResponse
-  ): string {
+  private getErrorMessage(error: HttpErrorResponse): string {
 
     if (error.status === 0) {
-      return 'No se puede conectar con el servidor.';
+
+      return (
+        'No se puede conectar con el servidor.'
+      );
     }
 
     if (error.status === 401) {
-      return 'El email o la contraseña no son correctos.';
+
+      return (
+        'El email o la contraseña no son correctos.'
+      );
     }
 
     if (error.status === 403) {
-      return 'La cuenta no tiene permiso para iniciar sesión.';
+
+      return (
+        'La cuenta no tiene permiso para iniciar sesión.'
+      );
     }
 
     if (error.status === 400) {
-      return 'Los datos introducidos no son válidos.';
+
+      return (
+        'Los datos introducidos no son válidos.'
+      );
     }
 
-    return 'Se ha producido un error. Inténtalo de nuevo.';
+    return (
+      'Se ha producido un error. Inténtalo de nuevo.'
+    );
   }
 }

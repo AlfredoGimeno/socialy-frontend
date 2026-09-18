@@ -188,3 +188,28 @@
   }
 
 }
+
+.register-link {
+  display: flex;
+  justify-content: center;
+
+  gap: 5px;
+
+  margin-top: 22px;
+
+  color: #69746d;
+
+  font-size: 14px;
+}
+
+.register-link a {
+  color: #2f7650;
+
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,355 @@
+:host {
+  display: block;
+}
+
+.register-page {
+  min-height: 100vh;
+
+  padding: 48px 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f2f8f4 0%,
+      #eef3f8 100%
+    );
+}
+
+.register-card {
+  width: 100%;
+  max-width: 900px;
+
+  margin: 0 auto;
+
+  padding: 42px;
+
+  background: #ffffff;
+
+  border:
+    1px solid #e4e9e6;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 16px 45px
+    rgba(0, 0, 0, 0.08);
+}
+
+.register-header {
+  margin-bottom: 38px;
+}
+
+.brand {
+  margin-bottom: 18px;
+
+  color: #2f7650;
+
+  font-size: 28px;
+  font-weight: 800;
+
+  letter-spacing: -0.5px;
+}
+
+.register-header h1 {
+  margin:
+    0 0 8px;
+
+  color: #17221b;
+
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.register-header p {
+  margin: 0;
+
+  color: #68746d;
+
+  font-size: 15px;
+}
+
+.form-section {
+  margin-bottom: 34px;
+
+  padding-bottom: 34px;
+
+  border-bottom:
+    1px solid #e5ebe7;
+}
+
+.form-section h2 {
+  margin:
+    0 0 20px;
+
+  color: #243128;
+
+  font-size: 19px;
+}
+
+.section-heading {
+  margin-bottom: 22px;
+}
+
+.section-heading h2 {
+  margin-bottom: 6px;
+}
+
+.section-heading p {
+  margin: 0;
+
+  color: #6d7871;
+
+  font-size: 14px;
+}
+
+.account-types {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 16px;
+}
+
+.account-option {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  padding: 20px;
+
+  border:
+    2px solid #dce4df;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.account-option:hover {
+  border-color: #99b6a4;
+}
+
+.account-option.selected {
+  border-color: #2f7650;
+
+  background: #f0f8f3;
+}
+
+.account-option input {
+  position: absolute;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+.account-title {
+  color: #253229;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.account-description {
+  color: #68746d;
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  grid-column:
+    1 / -1;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+
+  color: #28342d;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+
+  padding: 13px 14px;
+
+  border:
+    1px solid #cfd8d2;
+
+  border-radius: 9px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #17221b;
+
+  font-size: 15px;
+
+  resize: vertical;
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #438965;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(67, 137, 101, 0.14);
+}
+
+.field-error {
+  margin-top: 7px;
+
+  color: #b42318;
+
+  font-size: 13px;
+}
+
+.organization-section {
+  padding: 26px;
+
+  border:
+    1px solid #dce6df;
+
+  border-radius: 12px;
+
+  background: #fafcfb;
+}
+
+.register-error {
+  margin-bottom: 20px;
+
+  padding: 12px 14px;
+
+  border:
+    1px solid #f0b8b4;
+
+  border-radius: 8px;
+
+  background: #fff1f0;
+
+  color: #9f2018;
+
+  font-size: 14px;
+}
+
+.register-button {
+  width: 100%;
+
+  padding: 14px 18px;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  background: #2f7650;
+
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s,
+    opacity 0.2s;
+}
+
+.register-button:hover:not(:disabled) {
+  background: #265f41;
+}
+
+.register-button:disabled {
+  opacity: 0.65;
+
+  cursor: not-allowed;
+}
+
+.login-link {
+  display: flex;
+  justify-content: center;
+
+  gap: 5px;
+
+  margin-top: 22px;
+
+  color: #69746d;
+
+  font-size: 14px;
+}
+
+.login-link a {
+  color: #2f7650;
+
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+@media (
+  max-width: 700px
+) {
+
+  .register-page {
+    padding: 20px 14px;
+  }
+
+  .register-card {
+    padding: 28px 20px;
+  }
+
+  .account-types {
+    grid-template-columns:
+      1fr;
+  }
+
+  .form-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .form-group.full-width {
+    grid-column: auto;
+  }
+
+  .organization-section {
+    padding: 20px 16px;
+  }
+
+}

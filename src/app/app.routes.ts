@@ -4,8 +4,7 @@ import {guestGuard} from './core/auth/guards/guest.guard';
 import {roleGuard} from './core/auth/guards/role.guard';
 import {UserRole} from './core/auth/models/user-role';
 
-export const routes:
-  Routes = [
+export const routes:Routes = [
 
   {
     path: 'login',
@@ -19,7 +18,25 @@ export const routes:
         import(
           './features/auth/login/login'
         ).then(
-          module => module.Login
+          module =>
+            module.Login
+        )
+  },
+
+  {
+    path: 'register',
+
+    canActivate: [
+      guestGuard
+    ],
+
+    loadComponent:
+      () =>
+        import(
+          './features/auth/register/register'
+        ).then(
+          module =>
+            module.Register
         )
   },
 
@@ -32,6 +49,7 @@ export const routes:
     ],
 
     data: {
+
       roles: [
         UserRole.VOLUNTEER
       ],
@@ -59,6 +77,7 @@ export const routes:
     ],
 
     data: {
+
       roles: [
         UserRole.ORGANIZATION
       ],
@@ -86,6 +105,7 @@ export const routes:
     ],
 
     data: {
+
       roles: [
         UserRole.ADMIN
       ],

@@ -1,0 +1,4 @@
+export enum AccountType {
+  VOLUNTEER = 'VOLUNTEER',
+  ORGANIZATION = 'ORGANIZATION'
+}

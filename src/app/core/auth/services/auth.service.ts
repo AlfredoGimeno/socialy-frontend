@@ -7,6 +7,7 @@ import {LoginRequest} from '../models/login-request';
 import {AuthResponse} from '../models/auth-response';
 import {UserProfile} from '../models/user-profile';
 import {AuthStorageService} from './auth-storage.service';
+import { RegisterRequest } from '../models/register-request';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,23 @@ export class AuthService {
       })
 
     );
+  }
+
+  register(request: RegisterRequest): Observable<AuthResponse> {
+
+    return this.http.post<AuthResponse>(
+        `${API_BASE_URL}/auth/register`,
+        request
+      )
+      .pipe(
+
+        tap(response => {
+          this.storage.saveAuthResponse(
+              response
+            );
+        })
+
+      );
   }
 
   getCurrentUser():Observable<UserProfile> {

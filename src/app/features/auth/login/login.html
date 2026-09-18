@@ -46,7 +46,9 @@
           <div class="field-error">
 
             @if (
-              email.hasError('required')
+              email.hasError(
+                'required'
+              )
             ) {
               <span>
                 El email es obligatorio.
@@ -54,7 +56,9 @@
             }
 
             @if (
-              email.hasError('email')
+              email.hasError(
+                'email'
+              )
             ) {
               <span>
                 Introduce un email válido.
@@ -62,6 +66,7 @@
             }
 
           </div>
+
         }
 
       </div>
@@ -88,7 +93,9 @@
           <div class="field-error">
 
             @if (
-              password.hasError('required')
+              password.hasError(
+                'required'
+              )
             ) {
               <span>
                 La contraseña es obligatoria.
@@ -96,6 +103,7 @@
             }
 
           </div>
+
         }
 
       </div>
@@ -119,19 +127,27 @@
 
         @if (loading()) {
 
-          <span>
-            Iniciando sesión...
-          </span>
+          Iniciando sesión...
 
         } @else {
 
-          <span>
-            Iniciar sesión
-          </span>
+          Iniciar sesión
 
         }
 
       </button>
+
+      <div class="register-link">
+
+        <span>
+          ¿No tienes una cuenta?
+        </span>
+
+        <a routerLink="/register">
+          Crear una cuenta
+        </a>
+
+      </div>
 
     </form>
 
