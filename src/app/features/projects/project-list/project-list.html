@@ -1,0 +1,245 @@
+<section class="projects-page">
+
+  <div class="hero">
+
+    <div class="hero-content">
+
+      <span class="hero-label">
+        Voluntariado
+      </span>
+
+      <h1>
+        Encuentra un proyecto
+        en el que participar
+      </h1>
+
+      <p>
+        Descubre iniciativas de organizaciones
+        sociales y encuentra una causa con la
+        que colaborar.
+      </p>
+
+    </div>
+
+  </div>
+
+  <div class="projects-container">
+
+    <div class="section-header">
+
+      <div>
+
+        <h2>
+          Proyectos disponibles
+        </h2>
+
+        @if (!loading()) {
+
+          <p>
+            {{ projects().length }}
+            proyectos encontrados
+          </p>
+
+        }
+
+      </div>
+
+    </div>
+
+    @if (loading()) {
+
+      <div class="state-card">
+
+        <div class="loader"></div>
+
+        <p>
+          Cargando proyectos...
+        </p>
+
+      </div>
+
+    } @else if (errorMessage()) {
+
+      <div class="state-card error">
+
+        <h3>
+          No hemos podido cargar
+          los proyectos
+        </h3>
+
+        <p>
+          {{ errorMessage() }}
+        </p>
+
+      </div>
+
+    } @else if (
+      projects().length === 0
+    ) {
+
+      <div class="state-card">
+
+        <h3>
+          Todavía no hay proyectos
+        </h3>
+
+        <p>
+          Cuando las organizaciones publiquen
+          proyectos aparecerán aquí.
+        </p>
+
+      </div>
+
+    } @else {
+
+      <div class="projects-grid">
+
+        @for (
+          project of projects();
+          track project.id
+        ) {
+
+          <article class="project-card">
+
+            <div class="project-card-top">
+
+              <span class="category">
+
+                @if (project.category) {
+
+                  {{ project.category.name }}
+
+                } @else {
+
+                  Sin categoría
+
+                }
+
+              </span>
+
+              <span
+                class="status"
+                [class.open]="
+                  project.status === 'OPEN'
+                "
+                [class.closed]="
+                  project.status === 'CLOSED'
+                "
+                [class.finished]="
+                  project.status === 'FINISHED'
+                "
+                [class.cancelled]="
+                  project.status === 'CANCELLED'
+                "
+              >
+                {{
+                  statusLabel(
+                    project.status
+                  )
+                }}
+              </span>
+
+            </div>
+
+            <div class="project-body">
+
+              <h3>
+                {{ project.title }}
+              </h3>
+
+              <p class="organization">
+                {{ project.organization.name }}
+              </p>
+
+              <p class="description">
+                {{ project.description }}
+              </p>
+
+            </div>
+
+            <div class="project-info">
+
+              <div class="info-item">
+
+                <span class="info-label">
+                  Ubicación
+                </span>
+
+                <span>
+                  {{
+                    locationLabel(
+                      project
+                    )
+                  }}
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="info-label">
+                  Fechas
+                </span>
+
+                <span>
+                  {{
+                    project.startDate
+                      | date:'dd/MM/yyyy'
+                  }}
+                  -
+                  {{
+                    project.endDate
+                      | date:'dd/MM/yyyy'
+                  }}
+                </span>
+
+              </div>
+
+              @if (
+                project.maxVolunteers !== null
+              ) {
+
+                <div class="info-item">
+
+                  <span class="info-label">
+                    Máximo
+                  </span>
+
+                  <span>
+                    {{
+                      project.maxVolunteers
+                    }}
+                    voluntarios
+                  </span>
+
+                </div>
+
+              }
+
+            </div>
+
+            <div class="project-footer">
+
+              <a
+                [routerLink]="[
+                  '/projects',
+                  project.id
+                ]"
+                class="details-button"
+              >
+                Ver proyecto
+              </a>
+
+            </div>
+
+          </article>
+
+        }
+
+      </div>
+
+    }
+
+  </div>
+
+</section>

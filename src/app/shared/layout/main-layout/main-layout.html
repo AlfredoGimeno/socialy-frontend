@@ -1,0 +1,102 @@
+<div class="app-container">
+
+  <header class="main-header">
+
+    <div class="header-container">
+
+      <a
+        routerLink="/projects"
+        class="brand"
+      >
+        Socialy
+      </a>
+
+      <nav
+        class="main-navigation"
+        aria-label="Navegación principal"
+      >
+
+        <a
+          routerLink="/projects"
+          routerLinkActive="active"
+        >
+          Proyectos
+        </a>
+
+      </nav>
+
+      <div class="account-navigation">
+
+        @if (isAuthenticated()) {
+
+          @if (session(); as currentSession) {
+
+            <span class="user-name">
+              {{ currentSession.name }}
+            </span>
+
+            <a
+              [routerLink]="dashboardRoute()"
+              class="dashboard-link"
+            >
+              Mi área
+            </a>
+
+            <button
+              type="button"
+              class="logout-button"
+              (click)="logout()"
+            >
+              Cerrar sesión
+            </button>
+
+          }
+
+        } @else {
+
+          <a
+            routerLink="/login"
+            class="login-link"
+          >
+            Iniciar sesión
+          </a>
+
+          <a
+            routerLink="/register"
+            class="register-link"
+          >
+            Crear cuenta
+          </a>
+
+        }
+
+      </div>
+
+    </div>
+
+  </header>
+
+  <main class="main-content">
+
+    <router-outlet />
+
+  </main>
+
+  <footer class="main-footer">
+
+    <div class="footer-container">
+
+      <div class="footer-brand">
+        Socialy
+      </div>
+
+      <p>
+        Plataforma de voluntariado y
+        colaboración social.
+      </p>
+
+    </div>
+
+  </footer>
+
+</div>

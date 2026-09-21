@@ -1,0 +1,912 @@
+<section class="detail-page">
+
+  <div class="detail-container">
+
+    <a
+      routerLink="/projects"
+      class="back-link"
+    >
+      ← Volver a proyectos
+    </a>
+
+    @if (loading()) {
+
+      <div class="state-card">
+
+        <div class="loader"></div>
+
+        <p>
+          Cargando proyecto...
+        </p>
+
+      </div>
+
+    } @else if (errorMessage()) {
+
+      <div class="state-card error">
+
+        <h2>
+          Proyecto no disponible
+        </h2>
+
+        <p>
+          {{ errorMessage() }}
+        </p>
+
+        <a
+          routerLink="/projects"
+          class="back-button"
+        >
+          Ver todos los proyectos
+        </a>
+
+      </div>
+
+    } @else if (
+      project();
+      as currentProject
+    ) {
+
+      <div class="detail-grid">
+
+        <article class="project-content">
+
+          <div class="project-heading">
+
+            <div class="heading-top">
+
+              <span class="category">
+
+                @if (
+                  currentProject.category
+                ) {
+
+                  {{
+                    currentProject
+                      .category
+                      .name
+                  }}
+
+                } @else {
+
+                  Sin categoría
+
+                }
+
+              </span>
+
+              <span
+                class="status"
+                [class.open]="
+                  currentProject.status ===
+                  'OPEN'
+                "
+                [class.closed]="
+                  currentProject.status ===
+                  'CLOSED'
+                "
+                [class.finished]="
+                  currentProject.status ===
+                  'FINISHED'
+                "
+                [class.cancelled]="
+                  currentProject.status ===
+                  'CANCELLED'
+                "
+              >
+
+                {{
+                  statusLabel(
+                    currentProject.status
+                  )
+                }}
+
+              </span>
+
+            </div>
+
+            <h1>
+              {{ currentProject.title }}
+            </h1>
+
+            <p class="organization-name">
+              {{
+                currentProject
+                  .organization
+                  .name
+              }}
+            </p>
+
+          </div>
+
+          <div class="project-data">
+
+            <div class="data-item">
+
+              <span class="data-label">
+                Ubicación
+              </span>
+
+              <strong>
+                {{
+                  locationLabel(
+                    currentProject
+                  )
+                }}
+              </strong>
+
+            </div>
+
+            <div class="data-item">
+
+              <span class="data-label">
+                Inicio
+              </span>
+
+              <strong>
+                {{
+                  currentProject.startDate
+                    | date:'dd/MM/yyyy'
+                }}
+              </strong>
+
+            </div>
+
+            <div class="data-item">
+
+              <span class="data-label">
+                Fin
+              </span>
+
+              <strong>
+                {{
+                  currentProject.endDate
+                    | date:'dd/MM/yyyy'
+                }}
+              </strong>
+
+            </div>
+
+            @if (
+              currentProject.maxVolunteers !==
+              null
+            ) {
+
+              <div class="data-item">
+
+                <span class="data-label">
+                  Voluntarios
+                </span>
+
+                <strong>
+                  Máximo
+                  {{
+                    currentProject
+                      .maxVolunteers
+                  }}
+                </strong>
+
+              </div>
+
+            }
+
+          </div>
+
+          <section class="content-section">
+
+            <h2>
+              Sobre el proyecto
+            </h2>
+
+            <p>
+              {{
+                currentProject.description
+              }}
+            </p>
+
+          </section>
+
+          @if (
+            currentProject.requirements
+          ) {
+
+            <section class="content-section">
+
+              <h2>
+                Requisitos
+              </h2>
+
+              <p>
+                {{
+                  currentProject
+                    .requirements
+                }}
+              </p>
+
+            </section>
+
+          }
+
+          <section class="activities-section">
+
+            <div class="activities-heading">
+
+              <div>
+
+                <span class="section-label">
+                  Programación
+                </span>
+
+                <h2>
+                  Actividades del proyecto
+                </h2>
+
+                <p>
+                  Estas son las actividades previstas dentro del proyecto.
+                </p>
+
+              </div>
+
+              <span class="activity-count">
+
+                {{ activities().length }}
+
+                @if (
+                  activities().length === 1
+                ) {
+
+                  actividad
+
+                } @else {
+
+                  actividades
+
+                }
+
+              </span>
+
+            </div>
+
+            @if (
+              activities().length === 0
+            ) {
+
+              <div class="no-activities">
+
+                <h3>
+                  Aún no hay actividades
+                </h3>
+
+                <p>
+                  La organización todavía no ha programado actividades para este proyecto.
+                </p>
+
+              </div>
+
+            } @else {
+
+              <div class="activities-list">
+
+                @for (
+                  activity of activities();
+                  track activity.id
+                ) {
+
+                  <article
+                    class="activity-card"
+                  >
+
+                    <div
+                      class="activity-date"
+                    >
+
+                      <span class="day">
+                        {{
+                          activity.activityDate
+                            | date:'dd'
+                        }}
+                      </span>
+
+                      <span class="month">
+                        {{
+                          activity.activityDate
+                            | date:'MMM'
+                        }}
+                      </span>
+
+                    </div>
+
+                    <div
+                      class="activity-content"
+                    >
+
+                      <div
+                        class="activity-top"
+                      >
+
+                        <div>
+
+                          <h3>
+                            {{ activity.title }}
+                          </h3>
+
+                          <span
+                            class="activity-time"
+                          >
+                            {{
+                              activity.activityDate
+                                | date:'EEEE, d MMMM y · HH:mm'
+                            }}
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                      @if (
+                        activity.description
+                      ) {
+
+                        <p
+                          class="activity-description"
+                        >
+                          {{
+                            activity.description
+                          }}
+                        </p>
+
+                      }
+
+                      <div
+                        class="activity-meta"
+                      >
+
+                        <div
+                          class="activity-meta-item"
+                        >
+
+                          <span
+                            class="meta-label"
+                          >
+                            Lugar
+                          </span>
+
+                          <span>
+                            {{
+                              activityLocationLabel(
+                                activity
+                              )
+                            }}
+                          </span>
+
+                        </div>
+
+                        @if (
+                          activity.maxParticipants !==
+                          null
+                        ) {
+
+                          <div
+                            class="activity-meta-item"
+                          >
+
+                            <span
+                              class="meta-label"
+                            >
+                              Plazas
+                            </span>
+
+                            <span>
+                              Máximo
+                              {{
+                                activity
+                                  .maxParticipants
+                              }}
+                              participantes
+                            </span>
+
+                          </div>
+
+                        }
+
+                      </div>
+
+                      @if (
+                        isVolunteer &&
+                        myApplication()?.status ===
+                          ApplicationStatus.ACCEPTED
+                      ) {
+
+                        <div
+                          class="activity-access accepted"
+                        >
+                          Puedes participar en esta actividad. Próximamente conectaremos aquí la inscripción.
+                        </div>
+
+                      } @else {
+
+                        <div
+                          class="activity-access"
+                        >
+                          Para inscribirte en una actividad debes estar aceptado en el proyecto.
+                        </div>
+
+                      }
+
+                    </div>
+
+                  </article>
+
+                }
+
+              </div>
+
+            }
+
+          </section>
+
+        </article>
+
+        <aside class="project-sidebar">
+
+          <div class="organization-card">
+
+            <span class="card-label">
+              Organización
+            </span>
+
+            <h2>
+              {{
+                currentProject
+                  .organization
+                  .name
+              }}
+            </h2>
+
+            @if (
+              currentProject
+                .organization
+                .verified
+            ) {
+
+              <div class="verified">
+                Organización verificada
+              </div>
+
+            }
+
+            @if (
+              currentProject
+                .organization
+                .description
+            ) {
+
+              <p>
+                {{
+                  currentProject
+                    .organization
+                    .description
+                }}
+              </p>
+
+            }
+
+            <div class="organization-info">
+
+              @if (
+                currentProject
+                  .organization
+                  .city
+              ) {
+
+                <div>
+
+                  <span>
+                    Ciudad
+                  </span>
+
+                  <strong>
+                    {{
+                      currentProject
+                        .organization
+                        .city
+                    }}
+                  </strong>
+
+                </div>
+
+              }
+
+              @if (
+                currentProject
+                  .organization
+                  .email
+              ) {
+
+                <div>
+
+                  <span>
+                    Contacto
+                  </span>
+
+                  <strong>
+                    {{
+                      currentProject
+                        .organization
+                        .email
+                    }}
+                  </strong>
+
+                </div>
+
+              }
+
+              @if (
+                currentProject
+                  .organization
+                  .website
+              ) {
+
+                <div>
+
+                  <span>
+                    Web
+                  </span>
+
+                  <strong>
+                    {{
+                      currentProject
+                        .organization
+                        .website
+                    }}
+                  </strong>
+
+                </div>
+
+              }
+
+            </div>
+
+          </div>
+
+          @if (
+            currentProject.status ===
+            'OPEN'
+          ) {
+
+            <div class="participation-card">
+
+              <span class="card-label">
+                Participación
+              </span>
+
+              @if (!isAuthenticated) {
+
+                <h3>
+                  ¿Quieres formar parte del proyecto?
+                </h3>
+
+                <p>
+                  Inicia sesión como voluntario para solicitar tu incorporación.
+                </p>
+
+                <a
+                  routerLink="/login"
+                  class="participation-button"
+                >
+                  Iniciar sesión
+                </a>
+
+              } @else if (!isVolunteer) {
+
+                <h3>
+                  Información de participación
+                </h3>
+
+                <p>
+                  Solo los usuarios con rol de voluntario pueden solicitar participar en proyectos.
+                </p>
+
+              } @else if (
+                applicationLoading()
+              ) {
+
+                <div
+                  class="application-loading"
+                >
+
+                  <div
+                    class="small-loader"
+                  ></div>
+
+                  <span>
+                    Consultando tu solicitud...
+                  </span>
+
+                </div>
+
+              } @else if (
+                myApplication();
+                as application
+              ) {
+
+                <h3>
+                  Tu solicitud
+                </h3>
+
+                <div
+                  class="application-status"
+                  [class.pending]="
+                    application.status ===
+                    ApplicationStatus.PENDING
+                  "
+                  [class.accepted]="
+                    application.status ===
+                    ApplicationStatus.ACCEPTED
+                  "
+                  [class.rejected]="
+                    application.status ===
+                    ApplicationStatus.REJECTED
+                  "
+                  [class.cancelled]="
+                    application.status ===
+                    ApplicationStatus.CANCELLED
+                  "
+                >
+
+                  {{
+                    applicationStatusLabel(
+                      application.status
+                    )
+                  }}
+
+                </div>
+
+                <div
+                  class="application-date"
+                >
+                  Enviada el
+                  {{
+                    application.applicationDate
+                      | date:'dd/MM/yyyy HH:mm'
+                  }}
+                </div>
+
+                @if (
+                  application.motivation
+                ) {
+
+                  <div
+                    class="application-detail"
+                  >
+
+                    <span>
+                      Tu motivación
+                    </span>
+
+                    <p>
+                      {{
+                        application.motivation
+                      }}
+                    </p>
+
+                  </div>
+
+                }
+
+                @if (
+                  application.observations
+                ) {
+
+                  <div
+                    class="application-detail"
+                  >
+
+                    <span>
+                      Observaciones
+                    </span>
+
+                    <p>
+                      {{
+                        application.observations
+                      }}
+                    </p>
+
+                  </div>
+
+                }
+
+                @switch (
+                  application.status
+                ) {
+
+                  @case (
+                    ApplicationStatus.PENDING
+                  ) {
+
+                    <div
+                      class="application-message pending"
+                    >
+                      La organización todavía tiene que revisar tu solicitud.
+                    </div>
+
+                  }
+
+                  @case (
+                    ApplicationStatus.ACCEPTED
+                  ) {
+
+                    <div
+                      class="application-message accepted"
+                    >
+                      Has sido aceptado en el proyecto. Ya puedes participar en sus actividades.
+                    </div>
+
+                  }
+
+                  @case (
+                    ApplicationStatus.REJECTED
+                  ) {
+
+                    <div
+                      class="application-message rejected"
+                    >
+                      La organización ha rechazado tu solicitud.
+                    </div>
+
+                  }
+
+                  @case (
+                    ApplicationStatus.CANCELLED
+                  ) {
+
+                    <div
+                      class="application-message cancelled"
+                    >
+                      Esta solicitud está cancelada.
+                    </div>
+
+                  }
+
+                }
+
+              } @else {
+
+                <h3>
+                  Solicitar participación
+                </h3>
+
+                <p>
+                  Envía tu solicitud a la organización. Si es aceptada, podrás inscribirte en las actividades de este proyecto.
+                </p>
+
+                <form
+                  [formGroup]="applicationForm"
+                  (ngSubmit)="submitApplication()"
+                  class="application-form"
+                  novalidate
+                >
+
+                  <label for="motivation">
+                    Motivación
+                    <span>
+                      Opcional
+                    </span>
+                  </label>
+
+                  <textarea
+                    id="motivation"
+                    formControlName="motivation"
+                    rows="5"
+                    maxlength="1000"
+                    placeholder="Cuéntale brevemente a la organización por qué te interesa participar..."
+                  ></textarea>
+
+                  <div
+                    class="character-count"
+                  >
+                    {{
+                      applicationForm
+                        .controls
+                        .motivation
+                        .value
+                        .length
+                    }}
+                    / 1000
+                  </div>
+
+                  @if (
+                    applicationForm
+                      .controls
+                      .motivation
+                      .hasError(
+                        'maxlength'
+                      )
+                  ) {
+
+                    <div class="field-error">
+                      La motivación no puede superar los 1000 caracteres.
+                    </div>
+
+                  }
+
+                  @if (applicationError()) {
+
+                    <div
+                      class="application-error"
+                      role="alert"
+                    >
+                      {{ applicationError() }}
+                    </div>
+
+                  }
+
+                  @if (applicationSuccess()) {
+
+                    <div
+                      class="application-success"
+                    >
+                      {{ applicationSuccess() }}
+                    </div>
+
+                  }
+
+                  <button
+                    type="submit"
+                    class="participation-button"
+                    [disabled]="
+                      applicationSubmitting()
+                    "
+                  >
+
+                    @if (
+                      applicationSubmitting()
+                    ) {
+
+                      Enviando solicitud...
+
+                    } @else {
+
+                      Solicitar unirme al proyecto
+
+                    }
+
+                  </button>
+
+                </form>
+
+              }
+
+            </div>
+
+          } @else {
+
+            <div
+              class="participation-card closed-project"
+            >
+
+              <span class="card-label">
+                Participación
+              </span>
+
+              <h3>
+                Proyecto no abierto
+              </h3>
+
+              <p>
+                Este proyecto no acepta nuevas solicitudes actualmente.
+              </p>
+
+            </div>
+
+          }
+
+        </aside>
+
+      </div>
+
+    }
+
+  </div>
+
+</section>
