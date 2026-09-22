@@ -242,7 +242,9 @@
                 </h2>
 
                 <p>
-                  Estas son las actividades previstas dentro del proyecto.
+                  Consulta las actividades
+                  previstas y apúntate a las
+                  que quieras realizar.
                 </p>
 
               </div>
@@ -268,6 +270,21 @@
             </div>
 
             @if (
+              activityParticipationLoadError()
+            ) {
+
+              <div
+                class="activity-global-error"
+                role="alert"
+              >
+                {{
+                  activityParticipationLoadError()
+                }}
+              </div>
+
+            }
+
+            @if (
               activities().length === 0
             ) {
 
@@ -278,7 +295,9 @@
                 </h3>
 
                 <p>
-                  La organización todavía no ha programado actividades para este proyecto.
+                  La organización todavía no
+                  ha programado actividades
+                  para este proyecto.
                 </p>
 
               </div>
@@ -301,17 +320,21 @@
                     >
 
                       <span class="day">
+
                         {{
                           activity.activityDate
                             | date:'dd'
                         }}
+
                       </span>
 
                       <span class="month">
+
                         {{
                           activity.activityDate
                             | date:'MMM'
                         }}
+
                       </span>
 
                     </div>
@@ -333,10 +356,12 @@
                           <span
                             class="activity-time"
                           >
+
                             {{
                               activity.activityDate
                                 | date:'EEEE, d MMMM y · HH:mm'
                             }}
+
                           </span>
 
                         </div>
@@ -372,11 +397,13 @@
                           </span>
 
                           <span>
+
                             {{
                               activityLocationLabel(
                                 activity
                               )
                             }}
+
                           </span>
 
                         </div>
@@ -393,16 +420,18 @@
                             <span
                               class="meta-label"
                             >
-                              Plazas
+                              Capacidad
                             </span>
 
                             <span>
+
                               Máximo
                               {{
                                 activity
                                   .maxParticipants
                               }}
                               participantes
+
                             </span>
 
                           </div>
@@ -411,27 +440,288 @@
 
                       </div>
 
-                      @if (
-                        isVolunteer &&
-                        myApplication()?.status ===
+                      <div
+                        class="activity-participation"
+                      >
+
+                        @if (!isAuthenticated) {
+
+                          <div
+                            class="activity-info-message"
+                          >
+                            Inicia sesión como
+                            voluntario para poder
+                            participar.
+                          </div>
+
+                        } @else if (!isVolunteer) {
+
+                          <div
+                            class="activity-info-message"
+                          >
+                            Solo los voluntarios
+                            pueden inscribirse en
+                            actividades.
+                          </div>
+
+                        } @else if (
+                          myApplication()?.status !==
                           ApplicationStatus.ACCEPTED
-                      ) {
+                        ) {
 
-                        <div
-                          class="activity-access accepted"
-                        >
-                          Puedes participar en esta actividad. Próximamente conectaremos aquí la inscripción.
-                        </div>
+                          <div
+                            class="activity-info-message"
+                          >
+                            Debes estar aceptado
+                            en el proyecto para
+                            poder apuntarte a esta
+                            actividad.
+                          </div>
 
-                      } @else {
+                        } @else if (
+                          activityParticipationsLoading()
+                        ) {
 
-                        <div
-                          class="activity-access"
-                        >
-                          Para inscribirte en una actividad debes estar aceptado en el proyecto.
-                        </div>
+                          <div
+                            class="activity-loading"
+                          >
 
-                      }
+                            <div
+                              class="small-loader"
+                            ></div>
+
+                            <span>
+                              Consultando
+                              inscripción...
+                            </span>
+
+                          </div>
+
+                        } @else if (
+                          activityParticipation(
+                            activity.id
+                          );
+                          as participation
+                        ) {
+
+                          <div
+                            class="registered-panel"
+                          >
+
+                            <div
+                              class="registered-header"
+                            >
+
+                              <div>
+
+                                <span
+                                  class="registration-label"
+                                >
+                                  Tu participación
+                                </span>
+
+                                <span
+                                  class="attendance-status"
+                                  [class.registered]="
+                                    participation
+                                      .attendanceStatus ===
+                                    AttendanceStatus.REGISTERED
+                                  "
+                                  [class.attended]="
+                                    participation
+                                      .attendanceStatus ===
+                                    AttendanceStatus.ATTENDED
+                                  "
+                                  [class.absent]="
+                                    participation
+                                      .attendanceStatus ===
+                                    AttendanceStatus.ABSENT
+                                  "
+                                >
+
+                                  {{
+                                    attendanceStatusLabel(
+                                      participation
+                                        .attendanceStatus
+                                    )
+                                  }}
+
+                                </span>
+
+                              </div>
+
+                              @if (
+                                participation
+                                  .attendanceStatus ===
+                                  AttendanceStatus.REGISTERED
+                                &&
+                                !isActivityPast(
+                                  activity
+                                )
+                              ) {
+
+                                <button
+                                  type="button"
+                                  class="cancel-activity-button"
+                                  [disabled]="
+                                    isActivityActionLoading(
+                                      activity.id
+                                    )
+                                  "
+                                  (click)="
+                                    unregisterFromActivity(
+                                      participation
+                                    )
+                                  "
+                                >
+
+                                  @if (
+                                    isActivityActionLoading(
+                                      activity.id
+                                    )
+                                  ) {
+
+                                    Cancelando...
+
+                                  } @else {
+
+                                    Cancelar inscripción
+
+                                  }
+
+                                </button>
+
+                              }
+
+                            </div>
+
+                            @if (
+                              participation
+                                .attendanceStatus ===
+                              AttendanceStatus.REGISTERED
+                            ) {
+
+                              <p>
+                                Estás inscrito en
+                                esta actividad.
+                              </p>
+
+                            } @else if (
+                              participation
+                                .attendanceStatus ===
+                              AttendanceStatus.ATTENDED
+                            ) {
+
+                              <p>
+                                Tu asistencia a
+                                esta actividad ha
+                                sido registrada.
+                              </p>
+
+                            } @else if (
+                              participation
+                                .attendanceStatus ===
+                              AttendanceStatus.ABSENT
+                            ) {
+
+                              <p>
+                                Has sido marcado
+                                como ausente en
+                                esta actividad.
+                              </p>
+
+                            }
+
+                          </div>
+
+                        } @else if (
+                          isActivityPast(
+                            activity
+                          )
+                        ) {
+
+                          <div
+                            class="activity-info-message closed"
+                          >
+                            Esta actividad ya ha
+                            comenzado o finalizado
+                            y no admite nuevas
+                            inscripciones.
+                          </div>
+
+                        } @else {
+
+                          <div
+                            class="activity-action"
+                          >
+
+                            <div>
+
+                              <strong>
+                                ¿Quieres participar?
+                              </strong>
+
+                              <span>
+                                Tu solicitud al
+                                proyecto está
+                                aceptada.
+                              </span>
+
+                            </div>
+
+                            <button
+                              type="button"
+                              class="activity-register-button"
+                              [disabled]="
+                                isActivityActionLoading(
+                                  activity.id
+                                )
+                              "
+                              (click)="
+                                registerForActivity(
+                                  activity
+                                )
+                              "
+                            >
+
+                              @if (
+                                isActivityActionLoading(
+                                  activity.id
+                                )
+                              ) {
+
+                                Inscribiendo...
+
+                              } @else {
+
+                                Apuntarme a esta
+                                actividad
+
+                              }
+
+                            </button>
+
+                          </div>
+
+                        }
+
+                        @if (
+                          activityErrorFor(
+                            activity.id
+                          );
+                          as activityError
+                        ) {
+
+                          <div
+                            class="activity-error"
+                            role="alert"
+                          >
+                            {{ activityError }}
+                          </div>
+
+                        }
+
+                      </div>
 
                     </div>
 
@@ -456,11 +746,13 @@
             </span>
 
             <h2>
+
               {{
                 currentProject
                   .organization
                   .name
               }}
+
             </h2>
 
             @if (
@@ -482,11 +774,13 @@
             ) {
 
               <p>
+
                 {{
                   currentProject
                     .organization
                     .description
                 }}
+
               </p>
 
             }
@@ -506,11 +800,13 @@
                   </span>
 
                   <strong>
+
                     {{
                       currentProject
                         .organization
                         .city
                     }}
+
                   </strong>
 
                 </div>
@@ -530,11 +826,13 @@
                   </span>
 
                   <strong>
+
                     {{
                       currentProject
                         .organization
                         .email
                     }}
+
                   </strong>
 
                 </div>
@@ -554,11 +852,13 @@
                   </span>
 
                   <strong>
+
                     {{
                       currentProject
                         .organization
                         .website
                     }}
+
                   </strong>
 
                 </div>
@@ -583,11 +883,14 @@
               @if (!isAuthenticated) {
 
                 <h3>
-                  ¿Quieres formar parte del proyecto?
+                  ¿Quieres formar parte
+                  del proyecto?
                 </h3>
 
                 <p>
-                  Inicia sesión como voluntario para solicitar tu incorporación.
+                  Inicia sesión como
+                  voluntario para solicitar
+                  tu incorporación.
                 </p>
 
                 <a
@@ -600,11 +903,15 @@
               } @else if (!isVolunteer) {
 
                 <h3>
-                  Información de participación
+                  Información de
+                  participación
                 </h3>
 
                 <p>
-                  Solo los usuarios con rol de voluntario pueden solicitar participar en proyectos.
+                  Solo los usuarios con
+                  rol de voluntario pueden
+                  solicitar participar en
+                  proyectos.
                 </p>
 
               } @else if (
@@ -620,7 +927,8 @@
                   ></div>
 
                   <span>
-                    Consultando tu solicitud...
+                    Consultando tu
+                    solicitud...
                   </span>
 
                 </div>
@@ -665,11 +973,14 @@
                 <div
                   class="application-date"
                 >
+
                   Enviada el
+
                   {{
                     application.applicationDate
                       | date:'dd/MM/yyyy HH:mm'
                   }}
+
                 </div>
 
                 @if (
@@ -727,7 +1038,9 @@
                     <div
                       class="application-message pending"
                     >
-                      La organización todavía tiene que revisar tu solicitud.
+                      La organización todavía
+                      tiene que revisar tu
+                      solicitud.
                     </div>
 
                   }
@@ -739,7 +1052,10 @@
                     <div
                       class="application-message accepted"
                     >
-                      Has sido aceptado en el proyecto. Ya puedes participar en sus actividades.
+                      Has sido aceptado en
+                      el proyecto. Ya puedes
+                      inscribirte en sus
+                      actividades.
                     </div>
 
                   }
@@ -751,7 +1067,8 @@
                     <div
                       class="application-message rejected"
                     >
-                      La organización ha rechazado tu solicitud.
+                      La organización ha
+                      rechazado tu solicitud.
                     </div>
 
                   }
@@ -763,7 +1080,8 @@
                     <div
                       class="application-message cancelled"
                     >
-                      Esta solicitud está cancelada.
+                      Esta solicitud está
+                      cancelada.
                     </div>
 
                   }
@@ -777,7 +1095,12 @@
                 </h3>
 
                 <p>
-                  Envía tu solicitud a la organización. Si es aceptada, podrás inscribirte en las actividades de este proyecto.
+                  Envía tu solicitud a la
+                  organización. Si es
+                  aceptada, podrás
+                  inscribirte en las
+                  actividades de este
+                  proyecto.
                 </p>
 
                 <form
@@ -788,10 +1111,13 @@
                 >
 
                   <label for="motivation">
+
                     Motivación
+
                     <span>
                       Opcional
                     </span>
+
                   </label>
 
                   <textarea
@@ -805,6 +1131,7 @@
                   <div
                     class="character-count"
                   >
+
                     {{
                       applicationForm
                         .controls
@@ -813,6 +1140,7 @@
                         .length
                     }}
                     / 1000
+
                   </div>
 
                   @if (
@@ -824,29 +1152,41 @@
                       )
                   ) {
 
-                    <div class="field-error">
-                      La motivación no puede superar los 1000 caracteres.
+                    <div
+                      class="field-error"
+                    >
+                      La motivación no
+                      puede superar los
+                      1000 caracteres.
                     </div>
 
                   }
 
-                  @if (applicationError()) {
+                  @if (
+                    applicationError()
+                  ) {
 
                     <div
                       class="application-error"
                       role="alert"
                     >
-                      {{ applicationError() }}
+                      {{
+                        applicationError()
+                      }}
                     </div>
 
                   }
 
-                  @if (applicationSuccess()) {
+                  @if (
+                    applicationSuccess()
+                  ) {
 
                     <div
                       class="application-success"
                     >
-                      {{ applicationSuccess() }}
+                      {{
+                        applicationSuccess()
+                      }}
                     </div>
 
                   }
@@ -867,7 +1207,8 @@
 
                     } @else {
 
-                      Solicitar unirme al proyecto
+                      Solicitar unirme al
+                      proyecto
 
                     }
 
@@ -894,7 +1235,9 @@
               </h3>
 
               <p>
-                Este proyecto no acepta nuevas solicitudes actualmente.
+                Este proyecto no acepta
+                nuevas solicitudes
+                actualmente.
               </p>
 
             </div>

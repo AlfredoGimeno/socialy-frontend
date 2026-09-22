@@ -28,4 +28,13 @@ export class ApplicationService {
         request
       );
   }
+
+  cancelApplication(applicationId: number): Observable<void> {
+
+    return this.http
+      .patch<void>(
+        `${API_BASE_URL}/applications/${applicationId}/cancel`,
+        {}
+      );
+  }
 }

@@ -1,0 +1,1018 @@
+<section class="volunteer-page">
+
+  <div class="volunteer-container">
+
+    @if (loading()) {
+
+      <div class="loading-state">
+
+        <div class="loader"></div>
+
+        <p>
+          Cargando tu área de voluntariado...
+        </p>
+
+      </div>
+
+    } @else if (errorMessage()) {
+
+      <div class="error-state">
+
+        <h2>
+          No hemos podido cargar
+          tu información
+        </h2>
+
+        <p>
+          {{ errorMessage() }}
+        </p>
+
+      </div>
+
+    } @else {
+
+      <header class="volunteer-header">
+
+        <div>
+
+          <span class="header-label">
+            Área de voluntariado
+          </span>
+
+          <h1>
+
+            @if (session(); as currentSession) {
+
+              Hola, {{ currentSession.name }}
+
+            } @else {
+
+              Tu espacio de voluntariado
+
+            }
+
+          </h1>
+
+          <p>
+            Gestiona tus solicitudes,
+            proyectos y próximas actividades
+            desde un único lugar.
+          </p>
+
+        </div>
+
+        <a
+          routerLink="/projects"
+          class="explore-button"
+        >
+          Explorar proyectos
+        </a>
+
+      </header>
+
+      <section
+        class="summary-grid"
+        aria-label="Resumen"
+      >
+
+        <article class="summary-card">
+
+          <span class="summary-value">
+            {{ applications().length }}
+          </span>
+
+          <span class="summary-label">
+            Solicitudes
+          </span>
+
+          <small>
+            Enviadas a proyectos
+          </small>
+
+        </article>
+
+        <article class="summary-card">
+
+          <span class="summary-value">
+            {{
+              pendingApplications()
+                .length
+            }}
+          </span>
+
+          <span class="summary-label">
+            Pendientes
+          </span>
+
+          <small>
+            Esperando revisión
+          </small>
+
+        </article>
+
+        <article class="summary-card">
+
+          <span class="summary-value">
+            {{
+              acceptedApplications()
+                .length
+            }}
+          </span>
+
+          <span class="summary-label">
+            Proyectos activos
+          </span>
+
+          <small>
+            Solicitudes aceptadas
+          </small>
+
+        </article>
+
+        <article class="summary-card">
+
+          <span class="summary-value">
+            {{
+              upcomingParticipations()
+                .length
+            }}
+          </span>
+
+          <span class="summary-label">
+            Próximas actividades
+          </span>
+
+          <small>
+            En las que estás inscrito
+          </small>
+
+        </article>
+
+      </section>
+
+      @if (actionError()) {
+
+        <div
+          class="global-action-error"
+          role="alert"
+        >
+          {{ actionError() }}
+        </div>
+
+      }
+
+      <div class="dashboard-grid">
+
+        <div class="dashboard-main">
+
+          <section class="dashboard-section">
+
+            <div class="section-heading">
+
+              <div>
+
+                <span class="section-label">
+                  Seguimiento
+                </span>
+
+                <h2>
+                  Mis solicitudes
+                </h2>
+
+              </div>
+
+              <span class="section-count">
+                {{ applications().length }}
+              </span>
+
+            </div>
+
+            @if (
+              applications().length === 0
+            ) {
+
+              <div class="empty-state">
+
+                <h3>
+                  Todavía no has enviado
+                  ninguna solicitud
+                </h3>
+
+                <p>
+                  Explora los proyectos
+                  disponibles y encuentra
+                  una iniciativa en la que
+                  quieras colaborar.
+                </p>
+
+                <a
+                  routerLink="/projects"
+                  class="empty-button"
+                >
+                  Ver proyectos
+                </a>
+
+              </div>
+
+            } @else {
+
+              <div class="applications-list">
+
+                @for (
+                  application of applications();
+                  track application.id
+                ) {
+
+                  <article
+                    class="application-card"
+                  >
+
+                    <div
+                      class="application-main"
+                    >
+
+                      <div
+                        class="application-top"
+                      >
+
+                        <span
+                          class="application-category"
+                        >
+
+                          @if (
+                            application
+                              .project
+                              .category
+                          ) {
+
+                            {{
+                              application
+                                .project
+                                .category
+                                .name
+                            }}
+
+                          } @else {
+
+                            Proyecto
+
+                          }
+
+                        </span>
+
+                        <span
+                          class="application-status"
+                          [class.pending]="
+                            application.status ===
+                            ApplicationStatus.PENDING
+                          "
+                          [class.accepted]="
+                            application.status ===
+                            ApplicationStatus.ACCEPTED
+                          "
+                          [class.rejected]="
+                            application.status ===
+                            ApplicationStatus.REJECTED
+                          "
+                          [class.cancelled]="
+                            application.status ===
+                            ApplicationStatus.CANCELLED
+                          "
+                        >
+
+                          {{
+                            applicationStatusLabel(
+                              application.status
+                            )
+                          }}
+
+                        </span>
+
+                      </div>
+
+                      <h3>
+                        {{
+                          application
+                            .project
+                            .title
+                        }}
+                      </h3>
+
+                      <p
+                        class="organization-name"
+                      >
+                        {{
+                          application
+                            .project
+                            .organization
+                            .name
+                        }}
+                      </p>
+
+                      <div
+                        class="application-meta"
+                      >
+
+                        <div>
+
+                          <span>
+                            Ubicación
+                          </span>
+
+                          <strong>
+                            {{
+                              projectLocation(
+                                application
+                              )
+                            }}
+                          </strong>
+
+                        </div>
+
+                        <div>
+
+                          <span>
+                            Solicitud enviada
+                          </span>
+
+                          <strong>
+
+                            {{
+                              application
+                                .applicationDate
+                                | date:'dd/MM/yyyy'
+                            }}
+
+                          </strong>
+
+                        </div>
+
+                      </div>
+
+                      @if (
+                        application.motivation
+                      ) {
+
+                        <div
+                          class="motivation"
+                        >
+
+                          <span>
+                            Motivación
+                          </span>
+
+                          <p>
+                            {{
+                              application
+                                .motivation
+                            }}
+                          </p>
+
+                        </div>
+
+                      }
+
+                      @if (
+                        application.observations
+                      ) {
+
+                        <div
+                          class="observations"
+                        >
+
+                          <span>
+                            Observaciones
+                          </span>
+
+                          <p>
+                            {{
+                              application
+                                .observations
+                            }}
+                          </p>
+
+                        </div>
+
+                      }
+
+                    </div>
+
+                    <div
+                      class="application-actions"
+                    >
+
+                      <a
+                        [routerLink]="[
+                          '/projects',
+                          application.project.id
+                        ]"
+                        class="secondary-button"
+                      >
+                        Ver proyecto
+                      </a>
+
+                      @if (
+                        application.status ===
+                        ApplicationStatus.PENDING
+                      ) {
+
+                        <button
+                          type="button"
+                          class="cancel-button"
+                          [disabled]="
+                            isApplicationActionLoading(
+                              application.id
+                            )
+                          "
+                          (click)="
+                            cancelApplication(
+                              application
+                            )
+                          "
+                        >
+
+                          @if (
+                            isApplicationActionLoading(
+                              application.id
+                            )
+                          ) {
+
+                            Cancelando...
+
+                          } @else {
+
+                            Cancelar solicitud
+
+                          }
+
+                        </button>
+
+                      }
+
+                    </div>
+
+                  </article>
+
+                }
+
+              </div>
+
+            }
+
+          </section>
+
+          <section class="dashboard-section">
+
+            <div class="section-heading">
+
+              <div>
+
+                <span class="section-label">
+                  Agenda
+                </span>
+
+                <h2>
+                  Próximas actividades
+                </h2>
+
+              </div>
+
+              <span class="section-count">
+
+                {{
+                  upcomingParticipations()
+                    .length
+                }}
+
+              </span>
+
+            </div>
+
+            @if (
+              upcomingParticipations()
+                .length === 0
+            ) {
+
+              <div class="empty-state compact">
+
+                <h3>
+                  No tienes próximas
+                  actividades
+                </h3>
+
+                <p>
+                  Cuando te inscribas en
+                  actividades aparecerán aquí.
+                </p>
+
+              </div>
+
+            } @else {
+
+              <div class="activities-list">
+
+                @for (
+                  participation of
+                    upcomingParticipations();
+                  track participation.id
+                ) {
+
+                  <article
+                    class="activity-card"
+                  >
+
+                    <div
+                      class="activity-date"
+                    >
+
+                      <span class="day">
+
+                        {{
+                          participation
+                            .activity
+                            .activityDate
+                            | date:'dd'
+                        }}
+
+                      </span>
+
+                      <span class="month">
+
+                        {{
+                          participation
+                            .activity
+                            .activityDate
+                            | date:'MMM'
+                        }}
+
+                      </span>
+
+                    </div>
+
+                    <div
+                      class="activity-body"
+                    >
+
+                      <div
+                        class="activity-heading"
+                      >
+
+                        <div>
+
+                          <span
+                            class="activity-project"
+                          >
+                            {{
+                              participation
+                                .activity
+                                .project
+                                .title
+                            }}
+                          </span>
+
+                          <h3>
+                            {{
+                              participation
+                                .activity
+                                .title
+                            }}
+                          </h3>
+
+                        </div>
+
+                        <span
+                          class="attendance-status registered"
+                        >
+                          Inscrito
+                        </span>
+
+                      </div>
+
+                      <div
+                        class="activity-information"
+                      >
+
+                        <div>
+
+                          <span>
+                            Fecha y hora
+                          </span>
+
+                          <strong>
+
+                            {{
+                              participation
+                                .activity
+                                .activityDate
+                                | date:'dd/MM/yyyy HH:mm'
+                            }}
+
+                          </strong>
+
+                        </div>
+
+                        <div>
+
+                          <span>
+                            Lugar
+                          </span>
+
+                          <strong>
+                            {{
+                              activityLocation(
+                                participation
+                              )
+                            }}
+                          </strong>
+
+                        </div>
+
+                      </div>
+
+                      <div
+                        class="activity-actions"
+                      >
+
+                        <a
+                          [routerLink]="[
+                            '/projects',
+                            participation
+                              .activity
+                              .project
+                              .id
+                          ]"
+                          class="secondary-button"
+                        >
+                          Ver proyecto
+                        </a>
+
+                        <button
+                          type="button"
+                          class="cancel-button"
+                          [disabled]="
+                            isActivityActionLoading(
+                              participation.id
+                            )
+                          "
+                          (click)="
+                            unregisterFromActivity(
+                              participation
+                            )
+                          "
+                        >
+
+                          @if (
+                            isActivityActionLoading(
+                              participation.id
+                            )
+                          ) {
+
+                            Cancelando...
+
+                          } @else {
+
+                            Cancelar inscripción
+
+                          }
+
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  </article>
+
+                }
+
+              </div>
+
+            }
+
+          </section>
+
+          @if (
+            pastParticipations().length > 0
+          ) {
+
+            <section class="dashboard-section">
+
+              <div class="section-heading">
+
+                <div>
+
+                  <span class="section-label">
+                    Historial
+                  </span>
+
+                  <h2>
+                    Actividades anteriores
+                  </h2>
+
+                </div>
+
+                <span class="section-count">
+
+                  {{
+                    pastParticipations()
+                      .length
+                  }}
+
+                </span>
+
+              </div>
+
+              <div
+                class="history-list"
+              >
+
+                @for (
+                  participation of
+                    pastParticipations();
+                  track participation.id
+                ) {
+
+                  <article
+                    class="history-item"
+                  >
+
+                    <div>
+
+                      <span
+                        class="history-date"
+                      >
+
+                        {{
+                          participation
+                            .activity
+                            .activityDate
+                            | date:'dd/MM/yyyy'
+                        }}
+
+                      </span>
+
+                      <h3>
+                        {{
+                          participation
+                            .activity
+                            .title
+                        }}
+                      </h3>
+
+                      <p>
+                        {{
+                          participation
+                            .activity
+                            .project
+                            .title
+                        }}
+                      </p>
+
+                    </div>
+
+                    <span
+                      class="attendance-status"
+                      [class.registered]="
+                        participation
+                          .attendanceStatus ===
+                        AttendanceStatus.REGISTERED
+                      "
+                      [class.attended]="
+                        participation
+                          .attendanceStatus ===
+                        AttendanceStatus.ATTENDED
+                      "
+                      [class.absent]="
+                        participation
+                          .attendanceStatus ===
+                        AttendanceStatus.ABSENT
+                      "
+                    >
+
+                      {{
+                        attendanceStatusLabel(
+                          participation
+                            .attendanceStatus
+                        )
+                      }}
+
+                    </span>
+
+                  </article>
+
+                }
+
+              </div>
+
+            </section>
+
+          }
+
+        </div>
+
+        <aside class="dashboard-sidebar">
+
+          <section class="sidebar-card">
+
+            <span class="section-label">
+              Mis proyectos
+            </span>
+
+            <h2>
+              Proyectos aceptados
+            </h2>
+
+            @if (
+              acceptedApplications()
+                .length === 0
+            ) {
+
+              <div
+                class="sidebar-empty"
+              >
+
+                <p>
+                  Todavía no formas parte
+                  de ningún proyecto.
+                </p>
+
+                <a
+                  routerLink="/projects"
+                >
+                  Explorar proyectos
+                </a>
+
+              </div>
+
+            } @else {
+
+              <div
+                class="accepted-projects"
+              >
+
+                @for (
+                  application of
+                    acceptedApplications();
+                  track application.id
+                ) {
+
+                  <article
+                    class="accepted-project"
+                  >
+
+                    <span
+                      class="accepted-indicator"
+                    >
+                      Activo
+                    </span>
+
+                    <h3>
+                      {{
+                        application
+                          .project
+                          .title
+                      }}
+                    </h3>
+
+                    <p>
+                      {{
+                        application
+                          .project
+                          .organization
+                          .name
+                      }}
+                    </p>
+
+                    <div
+                      class="accepted-project-meta"
+                    >
+
+                      <span>
+                        {{
+                          application
+                            .project
+                            .startDate
+                            | date:'dd/MM/yyyy'
+                        }}
+                      </span>
+
+                      <span>
+                        →
+                      </span>
+
+                      <span>
+                        {{
+                          application
+                            .project
+                            .endDate
+                            | date:'dd/MM/yyyy'
+                        }}
+                      </span>
+
+                    </div>
+
+                    <a
+                      [routerLink]="[
+                        '/projects',
+                        application.project.id
+                      ]"
+                    >
+                      Ir al proyecto
+                    </a>
+
+                  </article>
+
+                }
+
+              </div>
+
+            }
+
+          </section>
+
+          <section
+            class="sidebar-card help-card"
+          >
+
+            <span class="section-label">
+              Cómo funciona
+            </span>
+
+            <h2>
+              Participar en Socialy
+            </h2>
+
+            <div class="help-step">
+
+              <span>
+                1
+              </span>
+
+              <div>
+
+                <strong>
+                  Solicita un proyecto
+                </strong>
+
+                <p>
+                  Envía tu motivación
+                  a la organización.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="help-step">
+
+              <span>
+                2
+              </span>
+
+              <div>
+
+                <strong>
+                  Espera la aceptación
+                </strong>
+
+                <p>
+                  La organización revisará
+                  tu solicitud.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="help-step">
+
+              <span>
+                3
+              </span>
+
+              <div>
+
+                <strong>
+                  Elige actividades
+                </strong>
+
+                <p>
+                  Apúntate a las actividades
+                  que quieras realizar.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </aside>
+
+      </div>
+
+    }
+
+  </div>
+
+</section>

@@ -9,10 +9,6 @@ export const routes:
 
   /*
    * AUTENTICACIÓN
-   *
-   * Login y registro quedan fuera del
-   * layout principal porque ya tienen
-   * su propio diseño a pantalla completa.
    */
   {
     path: 'login',
@@ -66,7 +62,7 @@ export const routes:
     children: [
 
       /*
-       * CATÁLOGO PÚBLICO
+       * PROYECTOS PÚBLICOS
        */
       {
         path: 'projects',
@@ -81,9 +77,6 @@ export const routes:
             )
       },
 
-      /*
-       * DETALLE PÚBLICO
-       */
       {
         path: 'projects/:id',
 
@@ -98,7 +91,7 @@ export const routes:
       },
 
       /*
-       * ÁREA DE VOLUNTARIO
+       * ÁREA REAL DEL VOLUNTARIO
        */
       {
         path: 'volunteer',
@@ -112,24 +105,24 @@ export const routes:
 
           roles: [
             UserRole.VOLUNTEER
-          ],
-
-          title:
-            'Área de voluntariado'
+          ]
         },
 
         loadComponent:
           () =>
             import(
-              './features/dashboard/dashboard'
+              './features/volunteer/volunteer-dashboard/volunteer-dashboard'
             ).then(
               module =>
-                module.Dashboard
+                module.VolunteerDashboard
             )
       },
 
       /*
-       * ÁREA DE ORGANIZACIÓN
+       * ORGANIZACIÓN
+       *
+       * Por ahora sigue utilizando
+       * el dashboard provisional.
        */
       {
         path: 'organization',
@@ -160,7 +153,10 @@ export const routes:
       },
 
       /*
-       * ÁREA DE ADMINISTRACIÓN
+       * ADMIN
+       *
+       * Por ahora sigue utilizando
+       * el dashboard provisional.
        */
       {
         path: 'admin',
@@ -191,7 +187,7 @@ export const routes:
       },
 
       /*
-       * PORTADA
+       * INICIO
        */
       {
         path: '',
@@ -205,7 +201,7 @@ export const routes:
   },
 
   /*
-   * CUALQUIER URL DESCONOCIDA
+   * URL DESCONOCIDA
    */
   {
     path: '**',
