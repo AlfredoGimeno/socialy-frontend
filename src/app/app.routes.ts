@@ -91,7 +91,7 @@ export const routes:
       },
 
       /*
-       * ÁREA REAL DEL VOLUNTARIO
+       * VOLUNTARIO
        */
       {
         path: 'volunteer',
@@ -120,9 +120,6 @@ export const routes:
 
       /*
        * ORGANIZACIÓN
-       *
-       * Por ahora sigue utilizando
-       * el dashboard provisional.
        */
       {
         path: 'organization',
@@ -136,27 +133,79 @@ export const routes:
 
           roles: [
             UserRole.ORGANIZATION
-          ],
-
-          title:
-            'Área de organización'
+          ]
         },
 
         loadComponent:
           () =>
             import(
-              './features/dashboard/dashboard'
+              './features/organization/organization-dashboard/organization-dashboard'
             ).then(
               module =>
-                module.Dashboard
+                module.OrganizationDashboard
+            )
+      },
+
+      /*
+       * CREAR PROYECTO
+       */
+      {
+        path:
+          'organization/projects/new',
+
+        canActivate: [
+          authGuard,
+          roleGuard
+        ],
+
+        data: {
+
+          roles: [
+            UserRole.ORGANIZATION
+          ]
+        },
+
+        loadComponent:
+          () =>
+            import(
+              './features/organization/project-form/organization-project-form'
+            ).then(
+              module =>
+                module.OrganizationProjectForm
+            )
+      },
+
+      /*
+       * EDITAR PROYECTO
+       */
+      {
+        path:
+          'organization/projects/:id/edit',
+
+        canActivate: [
+          authGuard,
+          roleGuard
+        ],
+
+        data: {
+
+          roles: [
+            UserRole.ORGANIZATION
+          ]
+        },
+
+        loadComponent:
+          () =>
+            import(
+              './features/organization/project-form/organization-project-form'
+            ).then(
+              module =>
+                module.OrganizationProjectForm
             )
       },
 
       /*
        * ADMIN
-       *
-       * Por ahora sigue utilizando
-       * el dashboard provisional.
        */
       {
         path: 'admin',

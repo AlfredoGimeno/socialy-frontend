@@ -1,0 +1,604 @@
+<section class="project-form-page">
+
+  <div class="form-container">
+
+    <a
+      routerLink="/organization"
+      class="back-link"
+    >
+      ← Volver al área de organización
+    </a>
+
+    @if (loading()) {
+
+      <div class="state-card">
+
+        <div class="loader"></div>
+
+        <p>
+          Preparando formulario...
+        </p>
+
+      </div>
+
+    } @else {
+
+      <div class="form-layout">
+
+        <main class="form-card">
+
+          <header class="form-header">
+
+            <span class="header-label">
+
+              @if (isEditMode()) {
+                Gestión de proyecto
+              } @else {
+                Nuevo proyecto
+              }
+
+            </span>
+
+            <h1>
+
+              @if (isEditMode()) {
+                Editar proyecto
+              } @else {
+                Crear proyecto
+              }
+
+            </h1>
+
+            <p>
+
+              @if (isEditMode()) {
+
+                Modifica los datos y el estado
+                del proyecto.
+
+              } @else {
+
+                Define los datos principales
+                del nuevo proyecto de
+                voluntariado.
+
+              }
+
+            </p>
+
+          </header>
+
+          @if (errorMessage()) {
+
+            <div
+              class="form-error"
+              role="alert"
+            >
+              {{ errorMessage() }}
+            </div>
+
+          }
+
+          @if (
+            organization()?.verified
+          ) {
+
+            <form
+              [formGroup]="form"
+              (ngSubmit)="save()"
+              novalidate
+            >
+
+              <section class="form-section">
+
+                <h2>
+                  Información principal
+                </h2>
+
+                <div class="form-grid">
+
+                  <div
+                    class="form-group full-width"
+                  >
+
+                    <label for="title">
+                      Título
+                    </label>
+
+                    <input
+                      id="title"
+                      type="text"
+                      formControlName="title"
+                      maxlength="150"
+                    >
+
+                    @if (
+                      form.controls
+                        .title
+                        .touched &&
+                      form.controls
+                        .title
+                        .invalid
+                    ) {
+
+                      <div class="field-error">
+
+                        @if (
+                          form.controls
+                            .title
+                            .hasError(
+                              'required'
+                            )
+                        ) {
+                          El título es obligatorio.
+                        }
+
+                        @if (
+                          form.controls
+                            .title
+                            .hasError(
+                              'maxlength'
+                            )
+                        ) {
+                          El título es demasiado largo.
+                        }
+
+                      </div>
+
+                    }
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label for="categoryId">
+                      Categoría
+                    </label>
+
+                    <select
+                      id="categoryId"
+                      formControlName="categoryId"
+                    >
+
+                      <option
+                        [ngValue]="null"
+                      >
+                        Selecciona una categoría
+                      </option>
+
+                      @for (
+                        category of categories();
+                        track category.id
+                      ) {
+
+                        <option
+                          [ngValue]="category.id"
+                        >
+                          {{ category.name }}
+                        </option>
+
+                      }
+
+                    </select>
+
+                    @if (
+                      form.controls
+                        .categoryId
+                        .touched &&
+                      form.controls
+                        .categoryId
+                        .hasError(
+                          'required'
+                        )
+                    ) {
+
+                      <div class="field-error">
+                        Selecciona una categoría.
+                      </div>
+
+                    }
+
+                  </div>
+
+                  @if (isEditMode()) {
+
+                    <div class="form-group">
+
+                      <label for="status">
+                        Estado
+                      </label>
+
+                      <select
+                        id="status"
+                        formControlName="status"
+                      >
+
+                        <option
+                          [ngValue]="
+                            ProjectStatus.OPEN
+                          "
+                        >
+                          Abierto
+                        </option>
+
+                        <option
+                          [ngValue]="
+                            ProjectStatus.CLOSED
+                          "
+                        >
+                          Cerrado
+                        </option>
+
+                        <option
+                          [ngValue]="
+                            ProjectStatus.FINISHED
+                          "
+                        >
+                          Finalizado
+                        </option>
+
+                        <option
+                          [ngValue]="
+                            ProjectStatus.CANCELLED
+                          "
+                        >
+                          Cancelado
+                        </option>
+
+                      </select>
+
+                    </div>
+
+                  }
+
+                  <div
+                    class="form-group full-width"
+                  >
+
+                    <label for="description">
+                      Descripción
+                    </label>
+
+                    <textarea
+                      id="description"
+                      formControlName="description"
+                      rows="6"
+                    ></textarea>
+
+                    @if (
+                      form.controls
+                        .description
+                        .touched &&
+                      form.controls
+                        .description
+                        .hasError(
+                          'required'
+                        )
+                    ) {
+
+                      <div class="field-error">
+                        La descripción es obligatoria.
+                      </div>
+
+                    }
+
+                  </div>
+
+                  <div
+                    class="form-group full-width"
+                  >
+
+                    <label for="requirements">
+                      Requisitos
+                    </label>
+
+                    <textarea
+                      id="requirements"
+                      formControlName="requirements"
+                      rows="4"
+                      placeholder="Experiencia, edad mínima, material necesario..."
+                    ></textarea>
+
+                  </div>
+
+                </div>
+
+              </section>
+
+              <section class="form-section">
+
+                <h2>
+                  Lugar
+                </h2>
+
+                <div class="form-grid">
+
+                  <div
+                    class="form-group full-width"
+                  >
+
+                    <label for="location">
+                      Lugar o dirección
+                    </label>
+
+                    <input
+                      id="location"
+                      type="text"
+                      formControlName="location"
+                      maxlength="150"
+                    >
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label for="city">
+                      Ciudad
+                    </label>
+
+                    <input
+                      id="city"
+                      type="text"
+                      formControlName="city"
+                      maxlength="100"
+                    >
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label for="province">
+                      Provincia
+                    </label>
+
+                    <input
+                      id="province"
+                      type="text"
+                      formControlName="province"
+                      maxlength="100"
+                    >
+
+                  </div>
+
+                </div>
+
+              </section>
+
+              <section class="form-section">
+
+                <h2>
+                  Fechas y plazas
+                </h2>
+
+                <div class="form-grid">
+
+                  <div class="form-group">
+
+                    <label for="startDate">
+                      Fecha de inicio
+                    </label>
+
+                    <input
+                      id="startDate"
+                      type="date"
+                      formControlName="startDate"
+                    >
+
+                    @if (
+                      form.controls
+                        .startDate
+                        .touched &&
+                      form.controls
+                        .startDate
+                        .hasError(
+                          'required'
+                        )
+                    ) {
+
+                      <div class="field-error">
+                        La fecha de inicio es obligatoria.
+                      </div>
+
+                    }
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label for="endDate">
+                      Fecha de fin
+                    </label>
+
+                    <input
+                      id="endDate"
+                      type="date"
+                      formControlName="endDate"
+                    >
+
+                    @if (
+                      form.controls
+                        .endDate
+                        .touched &&
+                      form.controls
+                        .endDate
+                        .hasError(
+                          'required'
+                        )
+                    ) {
+
+                      <div class="field-error">
+                        La fecha de fin es obligatoria.
+                      </div>
+
+                    }
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label for="maxVolunteers">
+                      Máximo de voluntarios
+                    </label>
+
+                    <input
+                      id="maxVolunteers"
+                      type="number"
+                      formControlName="maxVolunteers"
+                      min="1"
+                      step="1"
+                    >
+
+                    <small class="field-help">
+                      Déjalo vacío si no quieres
+                      establecer un máximo.
+                    </small>
+
+                    @if (
+                      form.controls
+                        .maxVolunteers
+                        .touched &&
+                      form.controls
+                        .maxVolunteers
+                        .hasError(
+                          'min'
+                        )
+                    ) {
+
+                      <div class="field-error">
+                        El máximo debe ser mayor que 0.
+                      </div>
+
+                    }
+
+                  </div>
+
+                </div>
+
+                @if (
+                  form.hasError(
+                    'invalidDateRange'
+                  ) &&
+                  (
+                    form.controls
+                      .startDate
+                      .touched ||
+                    form.controls
+                      .endDate
+                      .touched
+                  )
+                ) {
+
+                  <div class="date-error">
+                    La fecha de fin no puede ser
+                    anterior a la fecha de inicio.
+                  </div>
+
+                }
+
+              </section>
+
+              <div class="form-actions">
+
+                <a
+                  routerLink="/organization"
+                  class="cancel-button"
+                >
+                  Cancelar
+                </a>
+
+                <button
+                  type="submit"
+                  class="save-button"
+                  [disabled]="saving()"
+                >
+
+                  @if (saving()) {
+
+                    Guardando...
+
+                  } @else if (isEditMode()) {
+
+                    Guardar cambios
+
+                  } @else {
+
+                    Crear proyecto
+
+                  }
+
+                </button>
+
+              </div>
+
+            </form>
+
+          }
+
+        </main>
+
+        <aside class="form-sidebar">
+
+          <section class="info-card">
+
+            <span class="section-label">
+              Organización
+            </span>
+
+            @if (
+              organization();
+              as currentOrganization
+            ) {
+
+              <h2>
+                {{ currentOrganization.name }}
+              </h2>
+
+              @if (
+                currentOrganization.verified
+              ) {
+
+                <div class="verified-badge">
+                  Organización verificada
+                </div>
+
+              }
+
+            }
+
+          </section>
+
+          <section class="info-card">
+
+            <span class="section-label">
+              Consejo
+            </span>
+
+            <h2>
+              Define el proyecto
+              con claridad
+            </h2>
+
+            <p>
+              Las actividades concretas
+              se crearán posteriormente
+              dentro del proyecto.
+            </p>
+
+            <p>
+              El proyecto define el objetivo,
+              las fechas generales,
+              los requisitos y el número
+              máximo de voluntarios admitidos.
+            </p>
+
+          </section>
+
+        </aside>
+
+      </div>
+
+    }
+
+  </div>
+
+</section>

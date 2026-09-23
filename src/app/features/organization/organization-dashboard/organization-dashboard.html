@@ -1,0 +1,592 @@
+<section class="organization-page">
+
+  <div class="organization-container">
+
+    @if (loading()) {
+
+      <div class="state-card">
+
+        <div class="loader"></div>
+
+        <p>
+          Cargando el área de organización...
+        </p>
+
+      </div>
+
+    } @else if (errorMessage()) {
+
+      <div class="state-card error">
+
+        <h2>
+          No hemos podido cargar
+          la organización
+        </h2>
+
+        <p>
+          {{ errorMessage() }}
+        </p>
+
+      </div>
+
+    } @else if (
+      organization();
+      as currentOrganization
+    ) {
+
+      <header class="organization-header">
+
+        <div>
+
+          <span class="header-label">
+            Área de organización
+          </span>
+
+          <h1>
+            {{ currentOrganization.name }}
+          </h1>
+
+          <p>
+            Gestiona tus proyectos,
+            actividades y voluntarios
+            desde Socialy.
+          </p>
+
+        </div>
+
+        <div class="header-actions">
+
+          @if (isVerified()) {
+
+            <a
+              routerLink="/organization/projects/new"
+              class="primary-button"
+            >
+              Crear proyecto
+            </a>
+
+          }
+
+        </div>
+
+      </header>
+
+      @if (isVerified()) {
+
+        <div class="verification-card verified">
+
+          <div class="verification-icon">
+            ✓
+          </div>
+
+          <div>
+
+            <strong>
+              Organización verificada
+            </strong>
+
+            <p>
+              Puedes crear y gestionar
+              proyectos y actividades.
+            </p>
+
+          </div>
+
+        </div>
+
+      } @else {
+
+        <div class="verification-card pending">
+
+          <div class="verification-icon">
+            !
+          </div>
+
+          <div>
+
+            <strong>
+              Verificación pendiente
+            </strong>
+
+            <p>
+              Un administrador debe verificar
+              la organización antes de que
+              puedas crear o modificar proyectos.
+            </p>
+
+          </div>
+
+        </div>
+
+      }
+
+      <section
+        class="summary-grid"
+        aria-label="Resumen de proyectos"
+      >
+
+        <article class="summary-card">
+
+          <span class="summary-value">
+            {{ projects().length }}
+          </span>
+
+          <strong>
+            Proyectos
+          </strong>
+
+          <small>
+            Total de proyectos
+          </small>
+
+        </article>
+
+        <article class="summary-card">
+
+          <span class="summary-value">
+            {{ openProjects().length }}
+          </span>
+
+          <strong>
+            Abiertos
+          </strong>
+
+          <small>
+            Admitiendo solicitudes
+          </small>
+
+        </article>
+
+        <article class="summary-card">
+
+          <span class="summary-value">
+            {{ closedProjects().length }}
+          </span>
+
+          <strong>
+            Cerrados
+          </strong>
+
+          <small>
+            No admiten solicitudes
+          </small>
+
+        </article>
+
+        <article class="summary-card">
+
+          <span class="summary-value">
+            {{ finishedProjects().length }}
+          </span>
+
+          <strong>
+            Finalizados
+          </strong>
+
+          <small>
+            Proyectos completados
+          </small>
+
+        </article>
+
+      </section>
+
+      <div class="dashboard-grid">
+
+        <main class="dashboard-main">
+
+          <section class="projects-section">
+
+            <div class="section-heading">
+
+              <div>
+
+                <span class="section-label">
+                  Gestión
+                </span>
+
+                <h2>
+                  Mis proyectos
+                </h2>
+
+                <p>
+                  Proyectos creados por
+                  {{ currentOrganization.name }}.
+                </p>
+
+              </div>
+
+              <span class="project-count">
+                {{ projects().length }}
+              </span>
+
+            </div>
+
+            @if (
+              projects().length === 0
+            ) {
+
+              <div class="empty-state">
+
+                <h3>
+                  Todavía no tienes proyectos
+                </h3>
+
+                @if (isVerified()) {
+
+                  <p>
+                    Crea tu primer proyecto de
+                    voluntariado para empezar
+                    a recibir solicitudes.
+                  </p>
+
+                  <a
+                    routerLink="/organization/projects/new"
+                    class="primary-button"
+                  >
+                    Crear primer proyecto
+                  </a>
+
+                } @else {
+
+                  <p>
+                    Cuando la organización sea
+                    verificada podrás empezar
+                    a publicar proyectos.
+                  </p>
+
+                }
+
+              </div>
+
+            } @else {
+
+              <div class="projects-list">
+
+                @for (
+                  project of projects();
+                  track project.id
+                ) {
+
+                  <article class="project-card">
+
+                    <div class="project-main">
+
+                      <div class="project-top">
+
+                        <span class="category">
+
+                          @if (
+                            project.category
+                          ) {
+
+                            {{
+                              project
+                                .category
+                                .name
+                            }}
+
+                          } @else {
+
+                            Sin categoría
+
+                          }
+
+                        </span>
+
+                        <span
+                          class="project-status"
+                          [class.open]="
+                            project.status ===
+                            ProjectStatus.OPEN
+                          "
+                          [class.closed]="
+                            project.status ===
+                            ProjectStatus.CLOSED
+                          "
+                          [class.finished]="
+                            project.status ===
+                            ProjectStatus.FINISHED
+                          "
+                          [class.cancelled]="
+                            project.status ===
+                            ProjectStatus.CANCELLED
+                          "
+                        >
+
+                          {{
+                            statusLabel(
+                              project.status
+                            )
+                          }}
+
+                        </span>
+
+                      </div>
+
+                      <h3>
+                        {{ project.title }}
+                      </h3>
+
+                      <p class="description">
+                        {{ project.description }}
+                      </p>
+
+                      <div class="project-meta">
+
+                        <div>
+
+                          <span>
+                            Ubicación
+                          </span>
+
+                          <strong>
+                            {{
+                              projectLocation(
+                                project
+                              )
+                            }}
+                          </strong>
+
+                        </div>
+
+                        <div>
+
+                          <span>
+                            Inicio
+                          </span>
+
+                          <strong>
+                            {{
+                              project.startDate
+                                | date:'dd/MM/yyyy'
+                            }}
+                          </strong>
+
+                        </div>
+
+                        <div>
+
+                          <span>
+                            Fin
+                          </span>
+
+                          <strong>
+                            {{
+                              project.endDate
+                                | date:'dd/MM/yyyy'
+                            }}
+                          </strong>
+
+                        </div>
+
+                        @if (
+                          project.maxVolunteers !==
+                          null
+                        ) {
+
+                          <div>
+
+                            <span>
+                              Voluntarios
+                            </span>
+
+                            <strong>
+                              Máximo
+                              {{
+                                project
+                                  .maxVolunteers
+                              }}
+                            </strong>
+
+                          </div>
+
+                        }
+
+                      </div>
+
+                    </div>
+
+                    <div class="project-actions">
+
+                      <a
+                        [routerLink]="[
+                          '/projects',
+                          project.id
+                        ]"
+                        class="secondary-button"
+                      >
+                        Ver público
+                      </a>
+
+                      @if (isVerified()) {
+
+                        <a
+                          [routerLink]="[
+                            '/organization/projects',
+                            project.id,
+                            'edit'
+                          ]"
+                          class="edit-button"
+                        >
+                          Editar proyecto
+                        </a>
+
+                      }
+
+                    </div>
+
+                  </article>
+
+                }
+
+              </div>
+
+            }
+
+          </section>
+
+        </main>
+
+        <aside class="dashboard-sidebar">
+
+          <section class="sidebar-card">
+
+            <span class="section-label">
+              Organización
+            </span>
+
+            <h2>
+              Información
+            </h2>
+
+            <div class="organization-information">
+
+              <div>
+
+                <span>
+                  Nombre
+                </span>
+
+                <strong>
+                  {{ currentOrganization.name }}
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Email
+                </span>
+
+                <strong>
+                  {{ currentOrganization.email }}
+                </strong>
+
+              </div>
+
+              @if (
+                currentOrganization.phone
+              ) {
+
+                <div>
+
+                  <span>
+                    Teléfono
+                  </span>
+
+                  <strong>
+                    {{ currentOrganization.phone }}
+                  </strong>
+
+                </div>
+
+              }
+
+              @if (
+                currentOrganization.city
+              ) {
+
+                <div>
+
+                  <span>
+                    Ciudad
+                  </span>
+
+                  <strong>
+                    {{ currentOrganization.city }}
+                  </strong>
+
+                </div>
+
+              }
+
+              @if (
+                currentOrganization.province
+              ) {
+
+                <div>
+
+                  <span>
+                    Provincia
+                  </span>
+
+                  <strong>
+                    {{ currentOrganization.province }}
+                  </strong>
+
+                </div>
+
+              }
+
+              @if (
+                currentOrganization.website
+              ) {
+
+                <div>
+
+                  <span>
+                    Web
+                  </span>
+
+                  <strong>
+                    {{ currentOrganization.website }}
+                  </strong>
+
+                </div>
+
+              }
+
+            </div>
+
+          </section>
+
+          <section class="sidebar-card next-card">
+
+            <span class="section-label">
+              Próximamente
+            </span>
+
+            <h2>
+              Gestión del proyecto
+            </h2>
+
+            <p>
+              En el siguiente bloque añadiremos
+              la gestión de actividades,
+              solicitudes y voluntarios
+              directamente desde esta área.
+            </p>
+
+          </section>
+
+        </aside>
+
+      </div>
+
+    }
+
+  </div>
+
+</section>
