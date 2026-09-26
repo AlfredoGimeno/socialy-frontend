@@ -409,28 +409,43 @@
 
                     <div class="project-actions">
 
+                      @if (isVerified()) {
+
+                          <a
+                              [routerLink]="[
+                                  '/organization/projects',
+                                  project.id,
+                                  'manage'
+                              ]"
+                              class="manage-button"
+                          >
+                              Gestionar
+                          </a>
+
+                      }
+
                       <a
-                        [routerLink]="[
-                          '/projects',
-                          project.id
-                        ]"
-                        class="secondary-button"
+                          [routerLink]="[
+                              '/projects',
+                              project.id
+                          ]"
+                          class="secondary-button"
                       >
-                        Ver público
+                          Ver público
                       </a>
 
                       @if (isVerified()) {
 
-                        <a
-                          [routerLink]="[
-                            '/organization/projects',
-                            project.id,
-                            'edit'
-                          ]"
-                          class="edit-button"
-                        >
-                          Editar proyecto
-                        </a>
+                          <a
+                              [routerLink]="[
+                                  '/organization/projects',
+                                  project.id,
+                                  'edit'
+                              ]"
+                              class="edit-button"
+                          >
+                              Editar proyecto
+                          </a>
 
                       }
 
@@ -559,25 +574,6 @@
               }
 
             </div>
-
-          </section>
-
-          <section class="sidebar-card next-card">
-
-            <span class="section-label">
-              Próximamente
-            </span>
-
-            <h2>
-              Gestión del proyecto
-            </h2>
-
-            <p>
-              En el siguiente bloque añadiremos
-              la gestión de actividades,
-              solicitudes y voluntarios
-              directamente desde esta área.
-            </p>
 
           </section>
 

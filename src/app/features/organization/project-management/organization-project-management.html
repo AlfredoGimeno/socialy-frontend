@@ -1,0 +1,879 @@
+<section class="management-page">
+
+    <div class="management-container">
+
+        <a
+            routerLink="/organization"
+            class="back-link"
+        >
+            ← Volver al área de organización
+        </a>
+
+        @if (loading()) {
+
+            <div class="state-card">
+
+                <div class="loader"></div>
+
+                <p>
+                    Cargando gestión del proyecto...
+                </p>
+
+            </div>
+
+        } @else if (errorMessage()) {
+
+            <div class="state-card error">
+
+                <h2>
+                    Proyecto no disponible
+                </h2>
+
+                <p>
+                    {{ errorMessage() }}
+                </p>
+
+            </div>
+
+        } @else if (project(); as currentProject) {
+
+            <header class="project-header">
+
+                <div>
+
+                    <div class="header-top">
+
+                        <span class="category">
+
+                            @if (currentProject.category) {
+                                {{ currentProject.category.name }}
+                            } @else {
+                                Sin categoría
+                            }
+
+                        </span>
+
+                        <span
+                            class="project-status"
+                            [class.open]="currentProject.status === ProjectStatus.OPEN"
+                            [class.closed]="currentProject.status === ProjectStatus.CLOSED"
+                            [class.finished]="currentProject.status === ProjectStatus.FINISHED"
+                            [class.cancelled]="currentProject.status === ProjectStatus.CANCELLED"
+                        >
+                            {{ statusLabel(currentProject.status) }}
+                        </span>
+
+                    </div>
+
+                    <h1>
+                        {{ currentProject.title }}
+                    </h1>
+
+                    <p>
+                        {{ projectLocation(currentProject) }}
+                    </p>
+
+                </div>
+
+                <div class="header-actions">
+
+                    <a
+                        [routerLink]="[
+                            '/projects',
+                            currentProject.id
+                        ]"
+                        class="secondary-button"
+                    >
+                        Ver público
+                    </a>
+
+                    <a
+                        [routerLink]="[
+                            '/organization/projects',
+                            currentProject.id,
+                            'edit'
+                        ]"
+                        class="primary-button"
+                    >
+                        Editar proyecto
+                    </a>
+
+                </div>
+
+            </header>
+
+            <section class="summary-grid">
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ activities().length }}
+                    </span>
+
+                    <strong>
+                        Actividades
+                    </strong>
+
+                    <small>
+                        Programadas
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ applications().length }}
+                    </span>
+
+                    <strong>
+                        Solicitudes
+                    </strong>
+
+                    <small>
+                        Recibidas
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ pendingApplications().length }}
+                    </span>
+
+                    <strong>
+                        Pendientes
+                    </strong>
+
+                    <small>
+                        Por revisar
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ acceptedApplications().length }}
+                    </span>
+
+                    <strong>
+                        Voluntarios
+                    </strong>
+
+                    <small>
+                        Aceptados
+                    </small>
+
+                </article>
+
+            </section>
+
+            <div class="management-grid">
+
+                <main class="management-main">
+
+                    <section class="management-section">
+
+                        <div class="section-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    Programación
+                                </span>
+
+                                <h2>
+                                    Actividades
+                                </h2>
+
+                                <p>
+                                    Gestiona las actividades que forman parte del proyecto.
+                                </p>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                class="primary-button"
+                                (click)="openCreateActivityForm()"
+                            >
+                                Nueva actividad
+                            </button>
+
+                        </div>
+
+                        @if (activityError()) {
+
+                            <div
+                                class="message error-message"
+                                role="alert"
+                            >
+                                {{ activityError() }}
+                            </div>
+
+                        }
+
+                        @if (showActivityForm()) {
+
+                            <form
+                                class="activity-form"
+                                [formGroup]="activityForm"
+                                (ngSubmit)="saveActivity()"
+                                novalidate
+                            >
+
+                                <div class="activity-form-header">
+
+                                    <div>
+
+                                        <span class="section-label">
+                                            Actividad
+                                        </span>
+
+                                        <h3>
+
+                                            @if (editingActivityId() !== null) {
+                                                Editar actividad
+                                            } @else {
+                                                Nueva actividad
+                                            }
+
+                                        </h3>
+
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        class="close-button"
+                                        [disabled]="savingActivity()"
+                                        (click)="closeActivityForm()"
+                                    >
+                                        ×
+                                    </button>
+
+                                </div>
+
+                                <div class="form-grid">
+
+                                    <div class="form-group full-width">
+
+                                        <label for="activityTitle">
+                                            Título
+                                        </label>
+
+                                        <input
+                                            id="activityTitle"
+                                            type="text"
+                                            formControlName="title"
+                                            maxlength="150"
+                                        >
+
+                                        @if (
+                                            activityForm.controls.title.touched &&
+                                            activityForm.controls.title.hasError('required')
+                                        ) {
+
+                                            <div class="field-error">
+                                                El título es obligatorio.
+                                            </div>
+
+                                        }
+
+                                    </div>
+
+                                    <div class="form-group full-width">
+
+                                        <label for="activityDescription">
+                                            Descripción
+                                        </label>
+
+                                        <textarea
+                                            id="activityDescription"
+                                            formControlName="description"
+                                            rows="4"
+                                        ></textarea>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label for="activityDate">
+                                            Fecha y hora
+                                        </label>
+
+                                        <input
+                                            id="activityDate"
+                                            type="datetime-local"
+                                            formControlName="activityDate"
+                                        >
+
+                                        @if (
+                                            activityForm.controls.activityDate.touched &&
+                                            activityForm.controls.activityDate.hasError('required')
+                                        ) {
+
+                                            <div class="field-error">
+                                                La fecha y hora son obligatorias.
+                                            </div>
+
+                                        }
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label for="maxParticipants">
+                                            Máximo de participantes
+                                        </label>
+
+                                        <input
+                                            id="maxParticipants"
+                                            type="number"
+                                            formControlName="maxParticipants"
+                                            min="1"
+                                            step="1"
+                                        >
+
+                                        @if (
+                                            activityForm.controls.maxParticipants.touched &&
+                                            activityForm.controls.maxParticipants.hasError('min')
+                                        ) {
+
+                                            <div class="field-error">
+                                                El máximo debe ser mayor que 0.
+                                            </div>
+
+                                        }
+
+                                    </div>
+
+                                    <div class="form-group full-width">
+
+                                        <label for="activityLocation">
+                                            Lugar
+                                        </label>
+
+                                        <input
+                                            id="activityLocation"
+                                            type="text"
+                                            formControlName="location"
+                                            maxlength="150"
+                                        >
+
+                                    </div>
+
+                                </div>
+
+                                <div class="activity-form-actions">
+
+                                    <button
+                                        type="button"
+                                        class="cancel-button"
+                                        [disabled]="savingActivity()"
+                                        (click)="closeActivityForm()"
+                                    >
+                                        Cancelar
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        class="primary-button"
+                                        [disabled]="savingActivity()"
+                                    >
+
+                                        @if (savingActivity()) {
+
+                                            Guardando...
+
+                                        } @else if (editingActivityId() !== null) {
+
+                                            Guardar cambios
+
+                                        } @else {
+
+                                            Crear actividad
+
+                                        }
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        }
+
+                        @if (activities().length === 0) {
+
+                            <div class="empty-state">
+
+                                <h3>
+                                    No hay actividades
+                                </h3>
+
+                                <p>
+                                    Crea la primera actividad de este proyecto.
+                                </p>
+
+                            </div>
+
+                        } @else {
+
+                            <div class="activities-list">
+
+                                @for (activity of activities(); track activity.id) {
+
+                                    <article class="activity-card">
+
+                                        <div class="activity-date">
+
+                                            <span class="day">
+                                                {{ activity.activityDate | date:'dd' }}
+                                            </span>
+
+                                            <span class="month">
+                                                {{ activity.activityDate | date:'MMM' }}
+                                            </span>
+
+                                        </div>
+
+                                        <div class="activity-content">
+
+                                            <div class="activity-heading">
+
+                                                <div>
+
+                                                    <h3>
+                                                        {{ activity.title }}
+                                                    </h3>
+
+                                                    <span>
+                                                        {{ activity.activityDate | date:'dd/MM/yyyy · HH:mm' }}
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                            @if (activity.description) {
+
+                                                <p class="activity-description">
+                                                    {{ activity.description }}
+                                                </p>
+
+                                            }
+
+                                            <div class="activity-meta">
+
+                                                <div>
+
+                                                    <span>
+                                                        Lugar
+                                                    </span>
+
+                                                    <strong>
+                                                        {{ activity.location || 'Por determinar' }}
+                                                    </strong>
+
+                                                </div>
+
+                                                <div>
+
+                                                    <span>
+                                                        Capacidad
+                                                    </span>
+
+                                                    <strong>
+
+                                                        @if (activity.maxParticipants !== null) {
+                                                            {{ activity.maxParticipants }} participantes
+                                                        } @else {
+                                                            Sin límite
+                                                        }
+
+                                                    </strong>
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="activity-actions">
+
+                                                <a
+                                                    [routerLink]="[
+                                                        '/organization/activities',
+                                                        activity.id,
+                                                        'participants'
+                                                    ]"
+                                                    class="secondary-button"
+                                                >
+                                                    Participantes
+                                                </a>
+
+                                                <button
+                                                    type="button"
+                                                    class="secondary-button"
+                                                    (click)="openEditActivityForm(activity)"
+                                                >
+                                                    Editar
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    class="delete-button"
+                                                    [disabled]="isActivityDeleting(activity.id)"
+                                                    (click)="deleteActivity(activity)"
+                                                >
+
+                                                    @if (isActivityDeleting(activity.id)) {
+                                                        Eliminando...
+                                                    } @else {
+                                                        Eliminar
+                                                    }
+
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+                                    </article>
+
+                                }
+
+                            </div>
+
+                        }
+
+                    </section>
+
+                    <section class="management-section">
+
+                        <div class="section-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    Voluntariado
+                                </span>
+
+                                <h2>
+                                    Solicitudes
+                                </h2>
+
+                                <p>
+                                    Revisa las solicitudes de los voluntarios para incorporarse al proyecto.
+                                </p>
+
+                            </div>
+
+                            <span class="section-count">
+                                {{ applications().length }}
+                            </span>
+
+                        </div>
+
+                        @if (applicationError()) {
+
+                            <div
+                                class="message error-message"
+                                role="alert"
+                            >
+                                {{ applicationError() }}
+                            </div>
+
+                        }
+
+                        @if (applications().length === 0) {
+
+                            <div class="empty-state">
+
+                                <h3>
+                                    Todavía no hay solicitudes
+                                </h3>
+
+                                <p>
+                                    Las solicitudes de los voluntarios aparecerán aquí.
+                                </p>
+
+                            </div>
+
+                        } @else {
+
+                            <div class="applications-list">
+
+                                @for (application of applications(); track application.id) {
+
+                                    <article class="application-card">
+
+                                        <div class="application-main">
+
+                                            <div class="application-heading">
+
+                                                <div>
+
+                                                    <span class="volunteer-label">
+                                                        Voluntario
+                                                    </span>
+
+                                                    <h3>
+                                                        {{ application.user.name }}
+                                                        {{ application.user.surname }}
+                                                    </h3>
+
+                                                    <p>
+                                                        {{ application.user.email }}
+                                                    </p>
+
+                                                </div>
+
+                                                <span
+                                                    class="application-status"
+                                                    [class.pending]="application.status === ApplicationStatus.PENDING"
+                                                    [class.accepted]="application.status === ApplicationStatus.ACCEPTED"
+                                                    [class.rejected]="application.status === ApplicationStatus.REJECTED"
+                                                    [class.cancelled]="application.status === ApplicationStatus.CANCELLED"
+                                                >
+                                                    {{ applicationStatusLabel(application.status) }}
+                                                </span>
+
+                                            </div>
+
+                                            <div class="application-date">
+                                                Solicitud enviada el
+                                                {{ application.applicationDate | date:'dd/MM/yyyy HH:mm' }}
+                                            </div>
+
+                                            @if (application.motivation) {
+
+                                                <div class="application-text">
+
+                                                    <span>
+                                                        Motivación
+                                                    </span>
+
+                                                    <p>
+                                                        {{ application.motivation }}
+                                                    </p>
+
+                                                </div>
+
+                                            }
+
+                                            @if (application.observations) {
+
+                                                <div class="application-text">
+
+                                                    <span>
+                                                        Observaciones
+                                                    </span>
+
+                                                    <p>
+                                                        {{ application.observations }}
+                                                    </p>
+
+                                                </div>
+
+                                            }
+
+                                        </div>
+
+                                        @if (application.status === ApplicationStatus.PENDING) {
+
+                                            <div class="application-actions">
+
+                                                <button
+                                                    type="button"
+                                                    class="reject-button"
+                                                    [disabled]="isApplicationActionLoading(application.id)"
+                                                    (click)="rejectApplication(application)"
+                                                >
+                                                    Rechazar
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    class="accept-button"
+                                                    [disabled]="isApplicationActionLoading(application.id)"
+                                                    (click)="acceptApplication(application)"
+                                                >
+
+                                                    @if (isApplicationActionLoading(application.id)) {
+                                                        Procesando...
+                                                    } @else {
+                                                        Aceptar
+                                                    }
+
+                                                </button>
+
+                                            </div>
+
+                                        }
+
+                                    </article>
+
+                                }
+
+                            </div>
+
+                        }
+
+                    </section>
+
+                </main>
+
+                <aside class="management-sidebar">
+
+                    <section class="sidebar-card">
+
+                        <span class="section-label">
+                            Proyecto
+                        </span>
+
+                        <h2>
+                            Resumen
+                        </h2>
+
+                        <div class="project-information">
+
+                            <div>
+
+                                <span>
+                                    Estado
+                                </span>
+
+                                <strong>
+                                    {{ statusLabel(currentProject.status) }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Inicio
+                                </span>
+
+                                <strong>
+                                    {{ currentProject.startDate | date:'dd/MM/yyyy' }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Fin
+                                </span>
+
+                                <strong>
+                                    {{ currentProject.endDate | date:'dd/MM/yyyy' }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Voluntarios aceptados
+                                </span>
+
+                                <strong>
+
+                                    {{ acceptedApplications().length }}
+
+                                    @if (currentProject.maxVolunteers !== null) {
+                                        / {{ currentProject.maxVolunteers }}
+                                    }
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="sidebar-card">
+
+                        <span class="section-label">
+                            Solicitudes
+                        </span>
+
+                        <h2>
+                            Estado
+                        </h2>
+
+                        <div class="status-summary">
+
+                            <div>
+
+                                <span class="status-dot pending"></span>
+
+                                <span>
+                                    Pendientes
+                                </span>
+
+                                <strong>
+                                    {{ pendingApplications().length }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span class="status-dot accepted"></span>
+
+                                <span>
+                                    Aceptadas
+                                </span>
+
+                                <strong>
+                                    {{ acceptedApplications().length }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span class="status-dot rejected"></span>
+
+                                <span>
+                                    Rechazadas
+                                </span>
+
+                                <strong>
+                                    {{ rejectedApplications().length }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span class="status-dot cancelled"></span>
+
+                                <span>
+                                    Canceladas
+                                </span>
+
+                                <strong>
+                                    {{ cancelledApplications().length }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                </aside>
+
+            </div>
+
+        }
+
+    </div>
+
+</section>

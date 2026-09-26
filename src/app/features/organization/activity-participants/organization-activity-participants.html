@@ -1,0 +1,448 @@
+<section class="participants-page">
+
+    <div class="participants-container">
+
+        @if (project(); as currentProject) {
+
+            <a
+                [routerLink]="[
+                    '/organization/projects',
+                    currentProject.id,
+                    'manage'
+                ]"
+                class="back-link"
+            >
+                ← Volver a la gestión del proyecto
+            </a>
+
+        } @else {
+
+            <a
+                routerLink="/organization"
+                class="back-link"
+            >
+                ← Volver al área de organización
+            </a>
+
+        }
+
+        @if (loading()) {
+
+            <div class="state-card">
+
+                <div class="loader"></div>
+
+                <p>
+                    Cargando participantes...
+                </p>
+
+            </div>
+
+        } @else if (errorMessage()) {
+
+            <div class="state-card error">
+
+                <h2>
+                    No se puede gestionar la actividad
+                </h2>
+
+                <p>
+                    {{ errorMessage() }}
+                </p>
+
+            </div>
+
+        } @else if (
+            activity();
+            as currentActivity
+        ) {
+
+            <header class="activity-header">
+
+                <div>
+
+                    <span class="header-label">
+                        Gestión de asistencia
+                    </span>
+
+                    <h1>
+                        {{ currentActivity.title }}
+                    </h1>
+
+                    @if (project(); as currentProject) {
+
+                        <p class="project-name">
+                            {{ currentProject.title }}
+                        </p>
+
+                    }
+
+                </div>
+
+                <div class="activity-date-block">
+
+                    <span>
+                        Fecha y hora
+                    </span>
+
+                    <strong>
+                        {{
+                            currentActivity.activityDate
+                                | date:'dd/MM/yyyy · HH:mm'
+                        }}
+                    </strong>
+
+                </div>
+
+            </header>
+
+            <section class="activity-information">
+
+                <div>
+
+                    <span>
+                        Lugar
+                    </span>
+
+                    <strong>
+                        {{ activityLocation(currentActivity) }}
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Capacidad
+                    </span>
+
+                    <strong>
+
+                        @if (
+                            currentActivity.maxParticipants !== null
+                        ) {
+
+                            {{
+                                currentActivity.maxParticipants
+                            }}
+                            participantes
+
+                        } @else {
+
+                            Sin límite
+
+                        }
+
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Inscritos actualmente
+                    </span>
+
+                    <strong>
+                        {{ participants().length }}
+                    </strong>
+
+                </div>
+
+            </section>
+
+            <section class="summary-grid">
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ participants().length }}
+                    </span>
+
+                    <strong>
+                        Participantes
+                    </strong>
+
+                    <small>
+                        Total registrados
+                    </small>
+
+                </article>
+
+                <article class="summary-card pending">
+
+                    <span class="summary-value">
+                        {{ registeredParticipants().length }}
+                    </span>
+
+                    <strong>
+                        Sin registrar
+                    </strong>
+
+                    <small>
+                        Asistencia pendiente
+                    </small>
+
+                </article>
+
+                <article class="summary-card attended">
+
+                    <span class="summary-value">
+                        {{ attendedParticipants().length }}
+                    </span>
+
+                    <strong>
+                        Asistieron
+                    </strong>
+
+                    <small>
+                        Asistencia confirmada
+                    </small>
+
+                </article>
+
+                <article class="summary-card absent">
+
+                    <span class="summary-value">
+                        {{ absentParticipants().length }}
+                    </span>
+
+                    <strong>
+                        Ausentes
+                    </strong>
+
+                    <small>
+                        No asistieron
+                    </small>
+
+                </article>
+
+            </section>
+
+            @if (actionError()) {
+
+                <div
+                    class="action-error"
+                    role="alert"
+                >
+                    {{ actionError() }}
+                </div>
+
+            }
+
+            <section class="participants-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            Participantes
+                        </span>
+
+                        <h2>
+                            Control de asistencia
+                        </h2>
+
+                        <p>
+                            Marca la asistencia o ausencia de los voluntarios inscritos.
+                        </p>
+
+                    </div>
+
+                    <span class="participant-count">
+                        {{ participants().length }}
+                    </span>
+
+                </div>
+
+                @if (participants().length === 0) {
+
+                    <div class="empty-state">
+
+                        <h3>
+                            No hay participantes inscritos
+                        </h3>
+
+                        <p>
+                            Los voluntarios que se inscriban en esta actividad aparecerán aquí.
+                        </p>
+
+                    </div>
+
+                } @else {
+
+                    <div class="participants-list">
+
+                        @for (
+                            participant of participants();
+                            track participant.id
+                        ) {
+
+                            <article class="participant-card">
+
+                                <div class="participant-profile">
+
+                                    <div class="avatar">
+                                        {{
+                                            participant.user.name
+                                                .charAt(0)
+                                                .toUpperCase()
+                                        }}
+                                        {{
+                                            participant.user.surname
+                                                .charAt(0)
+                                                .toUpperCase()
+                                        }}
+                                    </div>
+
+                                    <div class="participant-identity">
+
+                                        <span class="volunteer-label">
+                                            Voluntario
+                                        </span>
+
+                                        <h3>
+                                            {{ participant.user.name }}
+                                            {{ participant.user.surname }}
+                                        </h3>
+
+                                        <p>
+                                            {{ participant.user.email }}
+                                        </p>
+
+                                        @if (participant.user.phone) {
+
+                                            <p>
+                                                {{ participant.user.phone }}
+                                            </p>
+
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                                <div class="participant-status">
+
+                                    <span
+                                        class="attendance-status"
+                                        [class.registered]="
+                                            participant.attendanceStatus ===
+                                            AttendanceStatus.REGISTERED
+                                        "
+                                        [class.attended]="
+                                            participant.attendanceStatus ===
+                                            AttendanceStatus.ATTENDED
+                                        "
+                                        [class.absent]="
+                                            participant.attendanceStatus ===
+                                            AttendanceStatus.ABSENT
+                                        "
+                                    >
+                                        {{
+                                            attendanceStatusLabel(
+                                                participant.attendanceStatus
+                                            )
+                                        }}
+                                    </span>
+
+                                    @if (participant.observations) {
+
+                                        <div class="observations">
+
+                                            <span>
+                                                Observaciones
+                                            </span>
+
+                                            <p>
+                                                {{ participant.observations }}
+                                            </p>
+
+                                        </div>
+
+                                    }
+
+                                </div>
+
+                                <div class="attendance-actions">
+
+                                    <button
+                                        type="button"
+                                        class="attended-button"
+                                        [class.active]="
+                                            participant.attendanceStatus ===
+                                            AttendanceStatus.ATTENDED
+                                        "
+                                        [disabled]="
+                                            isActionLoading(participant.id) ||
+                                            participant.attendanceStatus ===
+                                            AttendanceStatus.ATTENDED
+                                        "
+                                        (click)="
+                                            markAttended(participant)
+                                        "
+                                    >
+
+                                        @if (
+                                            isActionLoading(participant.id)
+                                        ) {
+
+                                            Guardando...
+
+                                        } @else {
+
+                                            Asistió
+
+                                        }
+
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="absent-button"
+                                        [class.active]="
+                                            participant.attendanceStatus ===
+                                            AttendanceStatus.ABSENT
+                                        "
+                                        [disabled]="
+                                            isActionLoading(participant.id) ||
+                                            participant.attendanceStatus ===
+                                            AttendanceStatus.ABSENT
+                                        "
+                                        (click)="
+                                            markAbsent(participant)
+                                        "
+                                    >
+
+                                        @if (
+                                            isActionLoading(participant.id)
+                                        ) {
+
+                                            Guardando...
+
+                                        } @else {
+
+                                            Ausente
+
+                                        }
+
+                                    </button>
+
+                                </div>
+
+                            </article>
+
+                        }
+
+                    </div>
+
+                }
+
+            </section>
+
+        }
+
+    </div>
+
+</section>

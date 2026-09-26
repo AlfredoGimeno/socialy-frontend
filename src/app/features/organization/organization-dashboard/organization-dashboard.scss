@@ -482,23 +482,29 @@
 
 .primary-button,
 .secondary-button,
-.edit-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.edit-button,
+.manage-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+}
 
-  min-height: 40px;
+.manage-button {
+    border: 1px solid #2f7650;
+    background: #2f7650;
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(47, 118, 80, 0.12);
+}
 
-  padding:
-    10px 14px;
-
-  border-radius: 8px;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  text-align: center;
-  text-decoration: none;
+.manage-button:hover {
+    background: #285f43;
 }
 
 .primary-button {

@@ -1,38 +1,56 @@
-import {inject,Injectable} from '@angular/core';
-
-import {HttpClient} from '@angular/common/http';
-
-import {Observable} from 'rxjs';
-
-import {API_BASE_URL} from '../../config/api.config';
-
-import {Activity} from '../models/activity';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { API_BASE_URL } from '../../config/api.config';
+import { Activity } from '../models/activity';
+import { CreateActivityRequest } from '../models/create-activity-request';
+import { UpdateActivityRequest } from '../models/update-activity-request';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ActivityService {
 
-  private readonly http = inject(HttpClient);
+    private readonly http = inject(HttpClient);
 
-  getActivities(): Observable<Activity[]> {
+    getActivities(): Observable<Activity[]> {
+        return this.http.get<Activity[]>(
+            `${API_BASE_URL}/activities`
+        );
+    }
 
-    return this.http.get<Activity[]>(
-      `${API_BASE_URL}/activities`
-    );
-  }
+    getActivitiesByProject(projectId: number): Observable<Activity[]> {
+        return this.http.get<Activity[]>(
+            `${API_BASE_URL}/activities/project/${projectId}`
+        );
+    }
 
-  getActivitiesByProject(projectId: number): Observable<Activity[]> {
+    getActivityById(id: number): Observable<Activity> {
+        return this.http.get<Activity>(
+            `${API_BASE_URL}/activities/${id}`
+        );
+    }
 
-    return this.http.get<Activity[]>(
-      `${API_BASE_URL}/activities/project/${projectId}`
-    );
-  }
+    createActivity(request: CreateActivityRequest): Observable<Activity> {
+        return this.http.post<Activity>(
+            `${API_BASE_URL}/activities`,
+            request
+        );
+    }
 
-  getActivityById(id: number): Observable<Activity> {
+    updateActivity(
+        activityId: number,
+        request: UpdateActivityRequest
+    ): Observable<Activity> {
+        return this.http.put<Activity>(
+            `${API_BASE_URL}/activities/${activityId}`,
+            request
+        );
+    }
 
-    return this.http.get<Activity>(
-      `${API_BASE_URL}/activities/${id}`
-    );
-  }
+    deleteActivity(activityId: number): Observable<void> {
+        return this.http.delete<void>(
+            `${API_BASE_URL}/activities/${activityId}`
+        );
+    }
 }
