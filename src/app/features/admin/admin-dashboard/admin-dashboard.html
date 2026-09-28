@@ -1,0 +1,534 @@
+<section class="admin-page">
+
+    <div class="admin-container">
+
+        @if (loading()) {
+
+            <div class="state-card">
+
+                <div class="loader"></div>
+
+                <p>
+                    Cargando panel de administración...
+                </p>
+
+            </div>
+
+        } @else if (errorMessage()) {
+
+            <div class="state-card error">
+
+                <h2>
+                    No se ha podido cargar Administración
+                </h2>
+
+                <p>
+                    {{ errorMessage() }}
+                </p>
+
+            </div>
+
+        } @else {
+
+            <header class="admin-header">
+
+                <div>
+
+                    <span class="header-label">
+                        Administración
+                    </span>
+
+                    <h1>
+                        Panel de control
+                    </h1>
+
+                    <p>
+                        Supervisa usuarios, organizaciones, proyectos y configuración general de Socialy.
+                    </p>
+
+                </div>
+
+                <a
+                    routerLink="/projects"
+                    class="secondary-button"
+                >
+                    Ver aplicación pública
+                </a>
+
+            </header>
+
+            <section class="summary-grid">
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ users().length }}
+                    </span>
+
+                    <strong>
+                        Usuarios
+                    </strong>
+
+                    <small>
+                        {{ activeUsers().length }} activos
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ organizations().length }}
+                    </span>
+
+                    <strong>
+                        Organizaciones
+                    </strong>
+
+                    <small>
+                        {{ pendingOrganizations().length }} pendientes
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ projects().length }}
+                    </span>
+
+                    <strong>
+                        Proyectos
+                    </strong>
+
+                    <small>
+                        {{ openProjects().length }} abiertos
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ categories().length }}
+                    </span>
+
+                    <strong>
+                        Categorías
+                    </strong>
+
+                    <small>
+                        Disponibles
+                    </small>
+
+                </article>
+
+            </section>
+
+            <div class="admin-grid">
+
+                <main class="admin-main">
+
+                    <section class="admin-section">
+
+                        <div class="section-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    Organizaciones
+                                </span>
+
+                                <h2>
+                                    Verificación de organizaciones
+                                </h2>
+
+                                <p>
+                                    Revisa las organizaciones registradas antes de permitirles gestionar proyectos.
+                                </p>
+
+                            </div>
+
+                            <div class="organization-summary">
+
+                                <span class="pending-count">
+                                    {{ pendingOrganizations().length }}
+                                    pendientes
+                                </span>
+
+                                <span class="verified-count">
+                                    {{ verifiedOrganizations().length }}
+                                    verificadas
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        @if (verificationError()) {
+
+                            <div
+                                class="action-error"
+                                role="alert"
+                            >
+                                {{ verificationError() }}
+                            </div>
+
+                        }
+
+                        @if (organizations().length === 0) {
+
+                            <div class="empty-state">
+
+                                <h3>
+                                    No hay organizaciones
+                                </h3>
+
+                                <p>
+                                    Cuando se registren organizaciones aparecerán aquí.
+                                </p>
+
+                            </div>
+
+                        } @else {
+
+                            <div class="organizations-list">
+
+                                @for (
+                                    organization of sortedOrganizations();
+                                    track organization.id
+                                ) {
+
+                                    <article
+                                        class="organization-card"
+                                        [class.pending]="!organization.verified"
+                                    >
+
+                                        <div class="organization-main">
+
+                                            <div class="organization-heading">
+
+                                                <div>
+
+                                                    <span class="organization-label">
+                                                        Organización
+                                                    </span>
+
+                                                    <h3>
+                                                        {{ organization.name }}
+                                                    </h3>
+
+                                                    <p>
+                                                        {{ organization.email }}
+                                                    </p>
+
+                                                </div>
+
+                                                @if (organization.verified) {
+
+                                                    <span class="verification-status verified">
+                                                        Verificada
+                                                    </span>
+
+                                                } @else {
+
+                                                    <span class="verification-status pending">
+                                                        Pendiente
+                                                    </span>
+
+                                                }
+
+                                            </div>
+
+                                            @if (organization.description) {
+
+                                                <p class="description">
+                                                    {{ organization.description }}
+                                                </p>
+
+                                            }
+
+                                            <div class="organization-meta">
+
+                                                <div>
+
+                                                    <span>
+                                                        Ubicación
+                                                    </span>
+
+                                                    <strong>
+                                                        {{ organizationLocation(organization) }}
+                                                    </strong>
+
+                                                </div>
+
+                                                @if (organization.phone) {
+
+                                                    <div>
+
+                                                        <span>
+                                                            Teléfono
+                                                        </span>
+
+                                                        <strong>
+                                                            {{ organization.phone }}
+                                                        </strong>
+
+                                                    </div>
+
+                                                }
+
+                                                @if (organization.website) {
+
+                                                    <div>
+
+                                                        <span>
+                                                            Web
+                                                        </span>
+
+                                                        <strong>
+                                                            {{ organization.website }}
+                                                        </strong>
+
+                                                    </div>
+
+                                                }
+
+                                                <div>
+
+                                                    <span>
+                                                        Registro
+                                                    </span>
+
+                                                    <strong>
+                                                        {{
+                                                            organization.createdAt
+                                                                | date:'dd/MM/yyyy'
+                                                        }}
+                                                    </strong>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="organization-actions">
+
+                                            @if (!organization.verified) {
+
+                                                <button
+                                                    type="button"
+                                                    class="verify-button"
+                                                    [disabled]="isVerificationLoading(organization.id)"
+                                                    (click)="verifyOrganization(organization)"
+                                                >
+
+                                                    @if (
+                                                        isVerificationLoading(organization.id)
+                                                    ) {
+
+                                                        Verificando...
+
+                                                    } @else {
+
+                                                        Verificar
+
+                                                    }
+
+                                                </button>
+
+                                            } @else {
+
+                                                <button
+                                                    type="button"
+                                                    class="unverify-button"
+                                                    [disabled]="isVerificationLoading(organization.id)"
+                                                    (click)="removeVerification(organization)"
+                                                >
+
+                                                    @if (
+                                                        isVerificationLoading(organization.id)
+                                                    ) {
+
+                                                        Actualizando...
+
+                                                    } @else {
+
+                                                        Quitar verificación
+
+                                                    }
+
+                                                </button>
+
+                                            }
+
+                                        </div>
+
+                                    </article>
+
+                                }
+
+                            </div>
+
+                        }
+
+                    </section>
+
+                </main>
+
+                <aside class="admin-sidebar">
+
+                    <section class="sidebar-card">
+
+                        <span class="section-label">
+                            Usuarios
+                        </span>
+
+                        <h2>
+                            Distribución
+                        </h2>
+
+                        <div class="stats-list">
+
+                            <div>
+
+                                <span>
+                                    Voluntarios
+                                </span>
+
+                                <strong>
+                                    {{ volunteers().length }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Usuarios de organización
+                                </span>
+
+                                <strong>
+                                    {{ organizationUsers().length }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Administradores
+                                </span>
+
+                                <strong>
+                                    {{ adminUsers().length }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="sidebar-card">
+
+                        <span class="section-label">
+                            Estado de usuarios
+                        </span>
+
+                        <h2>
+                            Cuentas
+                        </h2>
+
+                        <div class="stats-list">
+
+                            <div>
+
+                                <span>
+                                    Activas
+                                </span>
+
+                                <strong>
+                                    {{ activeUsers().length }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Inactivas
+                                </span>
+
+                                <strong>
+                                    {{ inactiveUsers().length }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="sidebar-card">
+
+                        <span class="section-label">
+                            Plataforma
+                        </span>
+
+                        <h2>
+                            Contenido
+                        </h2>
+
+                        <div class="stats-list">
+
+                            <div>
+
+                                <span>
+                                    Proyectos
+                                </span>
+
+                                <strong>
+                                    {{ projects().length }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Proyectos abiertos
+                                </span>
+
+                                <strong>
+                                    {{ openProjects().length }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Categorías
+                                </span>
+
+                                <strong>
+                                    {{ categories().length }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                </aside>
+
+            </div>
+
+        }
+
+    </div>
+
+</section>

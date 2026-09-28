@@ -151,12 +151,11 @@ export const routes: Routes = [
                 data: {
                     roles: [
                         UserRole.ADMIN
-                    ],
-                    title: 'Administración'
+                    ]
                 },
                 loadComponent: () =>
-                    import('./features/dashboard/dashboard').then(
-                        module => module.Dashboard
+                    import('./features/admin/admin-dashboard/admin-dashboard').then(
+                        module => module.AdminDashboard
                     )
             },
             {
