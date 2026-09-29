@@ -454,6 +454,54 @@
     animation: spin 0.8s linear infinite;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 9px;
+}
+
+.admin-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid #2f7650;
+    border-radius: 8px;
+    background: #2f7650;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 3px 10px rgba(47, 118, 80, 0.14);
+    transition:
+        background 0.2s,
+        transform 0.15s,
+        box-shadow 0.2s;
+}
+
+.admin-action-button:hover {
+    background: #285f43;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 13px rgba(47, 118, 80, 0.2);
+}
+
+.admin-action-button.secondary-admin-action {
+    border-color: #8eae9a;
+    background: #f2f8f4;
+    color: #326c4b;
+    box-shadow: none;
+}
+
+.admin-action-button.secondary-admin-action:hover {
+    border-color: #659077;
+    background: #e9f3ec;
+    color: #285f43;
+    box-shadow: none;
+}
+
 @keyframes spin {
     to {
         transform: rotate(360deg);
@@ -514,6 +562,16 @@
 
     .admin-sidebar {
         grid-template-columns: 1fr;
+    }
+
+    .header-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    }
+
+    .header-actions a {
+        width: 100%;
     }
 }
 

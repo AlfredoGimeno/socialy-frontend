@@ -143,6 +143,38 @@ export const routes: Routes = [
                     )
             },
             {
+                path: 'admin/categories',
+                canActivate: [
+                    authGuard,
+                    roleGuard
+                ],
+                data: {
+                    roles: [
+                        UserRole.ADMIN
+                    ]
+                },
+                loadComponent: () =>
+                    import('./features/admin/admin-categories/admin-categories').then(
+                        module => module.AdminCategories
+                    )
+            },
+            {
+                path: 'admin/users',
+                canActivate: [
+                    authGuard,
+                    roleGuard
+                ],
+                data: {
+                    roles: [
+                        UserRole.ADMIN
+                    ]
+                },
+                loadComponent: () =>
+                    import('./features/admin/admin-users/admin-users').then(
+                        module => module.AdminUsers
+                    )
+            },
+            {
                 path: 'admin',
                 canActivate: [
                     authGuard,

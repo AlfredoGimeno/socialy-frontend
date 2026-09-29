@@ -1,0 +1,440 @@
+<section class="users-page">
+
+    <div class="users-container">
+
+        <a
+            routerLink="/admin"
+            class="back-link"
+        >
+            ← Volver a Administración
+        </a>
+
+        @if (loading()) {
+
+            <div class="state-card">
+
+                <div class="loader"></div>
+
+                <p>
+                    Cargando usuarios...
+                </p>
+
+            </div>
+
+        } @else if (errorMessage()) {
+
+            <div class="state-card error">
+
+                <h2>
+                    No se pueden cargar los usuarios
+                </h2>
+
+                <p>
+                    {{ errorMessage() }}
+                </p>
+
+            </div>
+
+        } @else {
+
+            <header class="users-header">
+
+                <div>
+
+                    <span class="header-label">
+                        Administración
+                    </span>
+
+                    <h1>
+                        Usuarios
+                    </h1>
+
+                    <p>
+                        Consulta las cuentas registradas en Socialy y filtra por tipo de usuario o estado.
+                    </p>
+
+                </div>
+
+            </header>
+
+            <section class="summary-grid">
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ users().length }}
+                    </span>
+
+                    <strong>
+                        Usuarios
+                    </strong>
+
+                    <small>
+                        Total registrados
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ volunteerCount() }}
+                    </span>
+
+                    <strong>
+                        Voluntarios
+                    </strong>
+
+                    <small>
+                        Cuentas de voluntariado
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ organizationCount() }}
+                    </span>
+
+                    <strong>
+                        Organizaciones
+                    </strong>
+
+                    <small>
+                        Usuarios responsables
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ inactiveCount() }}
+                    </span>
+
+                    <strong>
+                        Inactivos
+                    </strong>
+
+                    <small>
+                        Cuentas desactivadas
+                    </small>
+
+                </article>
+
+            </section>
+
+            <section class="users-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            Gestión
+                        </span>
+
+                        <h2>
+                            Cuentas de usuario
+                        </h2>
+
+                        <p>
+                            Busca por nombre, apellidos, email o teléfono.
+                        </p>
+
+                    </div>
+
+                    <span class="results-count">
+                        {{ filteredUsers().length }}
+                    </span>
+
+                </div>
+
+                <div class="filters">
+
+                    <div class="search-field">
+
+                        <label for="userSearch">
+                            Buscar
+                        </label>
+
+                        <input
+                            id="userSearch"
+                            type="search"
+                            placeholder="Nombre, email, teléfono..."
+                            [ngModel]="searchTerm()"
+                            (ngModelChange)="onSearchChange($event)"
+                        >
+
+                    </div>
+
+                    <div class="filter-field">
+
+                        <label for="roleFilter">
+                            Rol
+                        </label>
+
+                        <select
+                            id="roleFilter"
+                            [ngModel]="roleFilter()"
+                            (ngModelChange)="onRoleFilterChange($event)"
+                        >
+                            <option value="ALL">
+                                Todos
+                            </option>
+
+                            <option [value]="UserRole.VOLUNTEER">
+                                Voluntarios
+                            </option>
+
+                            <option [value]="UserRole.ORGANIZATION">
+                                Organizaciones
+                            </option>
+
+                            <option [value]="UserRole.ADMIN">
+                                Administradores
+                            </option>
+                        </select>
+
+                    </div>
+
+                    <div class="filter-field">
+
+                        <label for="statusFilter">
+                            Estado
+                        </label>
+
+                        <select
+                            id="statusFilter"
+                            [ngModel]="statusFilter()"
+                            (ngModelChange)="onStatusFilterChange($event)"
+                        >
+                            <option value="ALL">
+                                Todos
+                            </option>
+
+                            <option value="ACTIVE">
+                                Activos
+                            </option>
+
+                            <option value="INACTIVE">
+                                Inactivos
+                            </option>
+                        </select>
+
+                    </div>
+
+                    @if (hasActiveFilters()) {
+
+                        <button
+                            type="button"
+                            class="clear-button"
+                            (click)="clearFilters()"
+                        >
+                            Limpiar filtros
+                        </button>
+
+                    }
+
+                </div>
+
+                <div class="filter-summary">
+
+                    <span>
+                        Mostrando
+                        <strong>
+                            {{ filteredUsers().length }}
+                        </strong>
+                        de
+                        <strong>
+                            {{ users().length }}
+                        </strong>
+                        usuarios
+                    </span>
+
+                    <span>
+                        Activos:
+                        <strong>
+                            {{ activeCount() }}
+                        </strong>
+                    </span>
+
+                    <span>
+                        Administradores:
+                        <strong>
+                            {{ adminCount() }}
+                        </strong>
+                    </span>
+
+                </div>
+
+                @if (filteredUsers().length === 0) {
+
+                    <div class="empty-state">
+
+                        <h3>
+                            No se han encontrado usuarios
+                        </h3>
+
+                        <p>
+                            Prueba a cambiar los filtros o el texto de búsqueda.
+                        </p>
+
+                        @if (hasActiveFilters()) {
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                (click)="clearFilters()"
+                            >
+                                Mostrar todos
+                            </button>
+
+                        }
+
+                    </div>
+
+                } @else {
+
+                    <div class="users-list">
+
+                        @for (
+                            user of filteredUsers();
+                            track user.id
+                        ) {
+
+                            <article
+                                class="user-card"
+                                [class.inactive]="!user.active"
+                            >
+
+                                <div class="user-avatar">
+                                    {{ initials(user) }}
+                                </div>
+
+                                <div class="user-main">
+
+                                    <div class="user-heading">
+
+                                        <div>
+
+                                            <h3>
+                                                {{ user.name }}
+                                                {{ user.surname }}
+                                            </h3>
+
+                                            <p>
+                                                {{ user.email }}
+                                            </p>
+
+                                        </div>
+
+                                        <div class="badges">
+
+                                            <span
+                                                class="role-badge"
+                                                [class.volunteer]="user.role === UserRole.VOLUNTEER"
+                                                [class.organization]="user.role === UserRole.ORGANIZATION"
+                                                [class.admin]="user.role === UserRole.ADMIN"
+                                            >
+                                                {{ roleLabel(user.role) }}
+                                            </span>
+
+                                            <span
+                                                class="status-badge"
+                                                [class.active]="user.active"
+                                                [class.inactive]="!user.active"
+                                            >
+
+                                                @if (user.active) {
+                                                    Activo
+                                                } @else {
+                                                    Inactivo
+                                                }
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="user-meta">
+
+                                        @if (user.phone) {
+
+                                            <div>
+
+                                                <span>
+                                                    Teléfono
+                                                </span>
+
+                                                <strong>
+                                                    {{ user.phone }}
+                                                </strong>
+
+                                            </div>
+
+                                        }
+
+                                        <div>
+
+                                            <span>
+                                                Registro
+                                            </span>
+
+                                            <strong>
+                                                {{
+                                                    user.createdAt
+                                                        | date:'dd/MM/yyyy'
+                                                }}
+                                            </strong>
+
+                                        </div>
+
+                                        <div>
+
+                                            <span>
+                                                Última actualización
+                                            </span>
+
+                                            <strong>
+                                                {{
+                                                    user.updatedAt
+                                                        | date:'dd/MM/yyyy HH:mm'
+                                                }}
+                                            </strong>
+
+                                        </div>
+
+                                        <div>
+
+                                            <span>
+                                                ID
+                                            </span>
+
+                                            <strong>
+                                                #{{ user.id }}
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        }
+
+                    </div>
+
+                }
+
+            </section>
+
+        }
+
+    </div>
+
+</section>

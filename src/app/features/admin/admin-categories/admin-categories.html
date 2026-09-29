@@ -1,0 +1,537 @@
+<section class="categories-page">
+
+    <div class="categories-container">
+
+        <a
+            routerLink="/admin"
+            class="back-link"
+        >
+            ← Volver a Administración
+        </a>
+
+        @if (loading()) {
+
+            <div class="state-card">
+
+                <div class="loader"></div>
+
+                <p>
+                    Cargando categorías...
+                </p>
+
+            </div>
+
+        } @else if (errorMessage()) {
+
+            <div class="state-card error">
+
+                <h2>
+                    No se pueden cargar las categorías
+                </h2>
+
+                <p>
+                    {{ errorMessage() }}
+                </p>
+
+            </div>
+
+        } @else {
+
+            <header class="categories-header">
+
+                <div>
+
+                    <span class="header-label">
+                        Administración
+                    </span>
+
+                    <h1>
+                        Categorías
+                    </h1>
+
+                    <p>
+                        Gestiona las categorías utilizadas para clasificar los proyectos de voluntariado.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    (click)="openCreateForm()"
+                >
+                    Nueva categoría
+                </button>
+
+            </header>
+
+            <section class="summary-grid">
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ categories().length }}
+                    </span>
+
+                    <strong>
+                        Categorías
+                    </strong>
+
+                    <small>
+                        Total disponibles
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ usedCategories().length }}
+                    </span>
+
+                    <strong>
+                        En uso
+                    </strong>
+
+                    <small>
+                        Asociadas a proyectos
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ unusedCategories().length }}
+                    </span>
+
+                    <strong>
+                        Sin utilizar
+                    </strong>
+
+                    <small>
+                        Se pueden eliminar
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ projects().length }}
+                    </span>
+
+                    <strong>
+                        Proyectos
+                    </strong>
+
+                    <small>
+                        Clasificados
+                    </small>
+
+                </article>
+
+            </section>
+
+            @if (actionError()) {
+
+                <div
+                    class="message error-message"
+                    role="alert"
+                >
+                    {{ actionError() }}
+                </div>
+
+            }
+
+            @if (actionSuccess()) {
+
+                <div
+                    class="message success-message"
+                    role="status"
+                >
+                    {{ actionSuccess() }}
+                </div>
+
+            }
+
+            <div class="categories-layout">
+
+                <main class="categories-main">
+
+                    @if (showForm()) {
+
+                        <section class="category-form-card">
+
+                            <div class="form-heading">
+
+                                <div>
+
+                                    <span class="section-label">
+                                        Categoría
+                                    </span>
+
+                                    <h2>
+
+                                        @if (
+                                            editingCategoryId() !== null
+                                        ) {
+                                            Editar categoría
+                                        } @else {
+                                            Nueva categoría
+                                        }
+
+                                    </h2>
+
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="close-button"
+                                    [disabled]="saving()"
+                                    (click)="closeForm()"
+                                    aria-label="Cerrar formulario"
+                                >
+                                    ×
+                                </button>
+
+                            </div>
+
+                            <form
+                                [formGroup]="categoryForm"
+                                (ngSubmit)="saveCategory()"
+                                novalidate
+                            >
+
+                                <div class="form-group">
+
+                                    <label for="categoryName">
+                                        Nombre
+                                    </label>
+
+                                    <input
+                                        id="categoryName"
+                                        type="text"
+                                        formControlName="name"
+                                        maxlength="100"
+                                        placeholder="Ej. Deporte"
+                                    >
+
+                                    <div class="character-count">
+                                        {{
+                                            categoryForm.controls.name.value.length
+                                        }}
+                                        / 100
+                                    </div>
+
+                                    @if (
+                                        categoryForm.controls.name.touched &&
+                                        categoryForm.controls.name.hasError('required')
+                                    ) {
+
+                                        <div class="field-error">
+                                            El nombre es obligatorio.
+                                        </div>
+
+                                    }
+
+                                    @if (
+                                        categoryForm.controls.name.touched &&
+                                        categoryForm.controls.name.hasError('maxlength')
+                                    ) {
+
+                                        <div class="field-error">
+                                            El nombre no puede superar los 100 caracteres.
+                                        </div>
+
+                                    }
+
+                                </div>
+
+                                <div class="form-group">
+
+                                    <label for="categoryDescription">
+                                        Descripción
+                                    </label>
+
+                                    <textarea
+                                        id="categoryDescription"
+                                        formControlName="description"
+                                        rows="5"
+                                        placeholder="Describe brevemente qué tipo de proyectos pertenecen a esta categoría."
+                                    ></textarea>
+
+                                </div>
+
+                                <div class="form-actions">
+
+                                    <button
+                                        type="button"
+                                        class="cancel-button"
+                                        [disabled]="saving()"
+                                        (click)="closeForm()"
+                                    >
+                                        Cancelar
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        class="primary-button"
+                                        [disabled]="saving()"
+                                    >
+
+                                        @if (saving()) {
+
+                                            Guardando...
+
+                                        } @else if (
+                                            editingCategoryId() !== null
+                                        ) {
+
+                                            Guardar cambios
+
+                                        } @else {
+
+                                            Crear categoría
+
+                                        }
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </section>
+
+                    }
+
+                    <section class="categories-section">
+
+                        <div class="section-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    Configuración
+                                </span>
+
+                                <h2>
+                                    Categorías disponibles
+                                </h2>
+
+                                <p>
+                                    Estas categorías aparecen en los formularios de proyectos y en el catálogo público.
+                                </p>
+
+                            </div>
+
+                            <span class="category-count">
+                                {{ categories().length }}
+                            </span>
+
+                        </div>
+
+                        @if (categories().length === 0) {
+
+                            <div class="empty-state">
+
+                                <h3>
+                                    No existen categorías
+                                </h3>
+
+                                <p>
+                                    Crea la primera categoría para poder clasificar proyectos.
+                                </p>
+
+                            </div>
+
+                        } @else {
+
+                            <div class="categories-list">
+
+                                @for (
+                                    category of sortedCategories();
+                                    track category.id
+                                ) {
+
+                                    <article class="category-card">
+
+                                        <div class="category-content">
+
+                                            <div class="category-heading">
+
+                                                <div class="category-icon">
+                                                    {{
+                                                        category.name
+                                                            .charAt(0)
+                                                            .toUpperCase()
+                                                    }}
+                                                </div>
+
+                                                <div>
+
+                                                    <span class="category-label">
+                                                        Categoría
+                                                    </span>
+
+                                                    <h3>
+                                                        {{ category.name }}
+                                                    </h3>
+
+                                                </div>
+
+                                            </div>
+
+                                            @if (category.description) {
+
+                                                <p class="category-description">
+                                                    {{ category.description }}
+                                                </p>
+
+                                            } @else {
+
+                                                <p class="category-description empty-description">
+                                                    Sin descripción.
+                                                </p>
+
+                                            }
+
+                                            <div class="category-meta">
+
+                                                <span>
+                                                    Proyectos asociados
+                                                </span>
+
+                                                <strong>
+                                                    {{ projectCount(category.id) }}
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="category-actions">
+
+                                            <button
+                                                type="button"
+                                                class="edit-button"
+                                                (click)="openEditForm(category)"
+                                            >
+                                                Editar
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                class="delete-button"
+                                                [disabled]="
+                                                    projectCount(category.id) > 0 ||
+                                                    isDeleting(category.id)
+                                                "
+                                                [title]="
+                                                    projectCount(category.id) > 0
+                                                        ? 'No se puede eliminar porque existen proyectos que utilizan esta categoría'
+                                                        : 'Eliminar categoría'
+                                                "
+                                                (click)="deleteCategory(category)"
+                                            >
+
+                                                @if (
+                                                    isDeleting(category.id)
+                                                ) {
+
+                                                    Eliminando...
+
+                                                } @else {
+
+                                                    Eliminar
+
+                                                }
+
+                                            </button>
+
+                                        </div>
+
+                                    </article>
+
+                                }
+
+                            </div>
+
+                        }
+
+                    </section>
+
+                </main>
+
+                <aside class="categories-sidebar">
+
+                    <section class="sidebar-card">
+
+                        <span class="section-label">
+                            Importante
+                        </span>
+
+                        <h2>
+                            Eliminación de categorías
+                        </h2>
+
+                        <p>
+                            Una categoría que esté asociada a uno o más proyectos no puede eliminarse.
+                        </p>
+
+                        <p>
+                            Puedes modificar su nombre o descripción sin perder la relación con esos proyectos.
+                        </p>
+
+                    </section>
+
+                    <section class="sidebar-card">
+
+                        <span class="section-label">
+                            Categorías iniciales
+                        </span>
+
+                        <h2>
+                            Socialy
+                        </h2>
+
+                        <div class="initial-categories">
+
+                            <span>
+                                Medio ambiente
+                            </span>
+
+                            <span>
+                                Inclusión social
+                            </span>
+
+                            <span>
+                                Educación
+                            </span>
+
+                            <span>
+                                Salud
+                            </span>
+
+                            <span>
+                                Animales
+                            </span>
+
+                            <span>
+                                Cultura
+                            </span>
+
+                        </div>
+
+                    </section>
+
+                </aside>
+
+            </div>
+
+        }
+
+    </div>
+
+</section>
