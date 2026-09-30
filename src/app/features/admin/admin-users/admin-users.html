@@ -50,7 +50,7 @@
                     </h1>
 
                     <p>
-                        Consulta las cuentas registradas en Socialy y filtra por tipo de usuario o estado.
+                        Consulta, filtra y administra las cuentas registradas en Socialy.
                     </p>
 
                 </div>
@@ -125,6 +125,28 @@
 
             </section>
 
+            @if (actionError()) {
+
+                <div
+                    class="message error-message"
+                    role="alert"
+                >
+                    {{ actionError() }}
+                </div>
+
+            }
+
+            @if (actionSuccess()) {
+
+                <div
+                    class="message success-message"
+                    role="status"
+                >
+                    {{ actionSuccess() }}
+                </div>
+
+            }
+
             <section class="users-section">
 
                 <div class="section-heading">
@@ -180,6 +202,7 @@
                             [ngModel]="roleFilter()"
                             (ngModelChange)="onRoleFilterChange($event)"
                         >
+
                             <option value="ALL">
                                 Todos
                             </option>
@@ -195,6 +218,7 @@
                             <option [value]="UserRole.ADMIN">
                                 Administradores
                             </option>
+
                         </select>
 
                     </div>
@@ -210,6 +234,7 @@
                             [ngModel]="statusFilter()"
                             (ngModelChange)="onStatusFilterChange($event)"
                         >
+
                             <option value="ALL">
                                 Todos
                             </option>
@@ -221,6 +246,7 @@
                             <option value="INACTIVE">
                                 Inactivos
                             </option>
+
                         </select>
 
                     </div>
@@ -319,10 +345,22 @@
 
                                         <div>
 
-                                            <h3>
-                                                {{ user.name }}
-                                                {{ user.surname }}
-                                            </h3>
+                                            <div class="user-name-row">
+
+                                                <h3>
+                                                    {{ user.name }}
+                                                    {{ user.surname }}
+                                                </h3>
+
+                                                @if (isCurrentUser(user)) {
+
+                                                    <span class="current-user-badge">
+                                                        Tu cuenta
+                                                    </span>
+
+                                                }
+
+                                            </div>
 
                                             <p>
                                                 {{ user.email }}
@@ -418,6 +456,52 @@
                                             </strong>
 
                                         </div>
+
+                                    </div>
+
+                                    <div class="user-actions">
+
+                                        @if (isCurrentUser(user)) {
+
+                                            <span class="self-protection-message">
+                                                Tu propia cuenta no puede desactivarse desde aquí.
+                                            </span>
+
+                                        } @else if (user.active) {
+
+                                            <button
+                                                type="button"
+                                                class="deactivate-button"
+                                                [disabled]="isAnyUserActionLoading()"
+                                                (click)="deactivateUser(user)"
+                                            >
+
+                                                @if (isUserActionLoading(user.id)) {
+                                                    Desactivando...
+                                                } @else {
+                                                    Desactivar cuenta
+                                                }
+
+                                            </button>
+
+                                        } @else {
+
+                                            <button
+                                                type="button"
+                                                class="reactivate-button"
+                                                [disabled]="isAnyUserActionLoading()"
+                                                (click)="reactivateUser(user)"
+                                            >
+
+                                                @if (isUserActionLoading(user.id)) {
+                                                    Reactivando...
+                                                } @else {
+                                                    Reactivar cuenta
+                                                }
+
+                                            </button>
+
+                                        }
 
                                     </div>
 

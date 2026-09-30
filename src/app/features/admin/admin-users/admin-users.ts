@@ -4,9 +4,11 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 import { AdminUser } from '../../../core/admin/models/admin-user';
 import { AdminUserService } from '../../../core/admin/services/admin-user.service';
 import { UserRole } from '../../../core/auth/models/user-role';
+import { AuthStorageService } from '../../../core/auth/services/auth-storage.service';
 
 type RoleFilter = 'ALL' | UserRole;
 type StatusFilter = 'ALL' | 'ACTIVE' | 'INACTIVE';
@@ -24,6 +26,7 @@ type StatusFilter = 'ALL' | 'ACTIVE' | 'INACTIVE';
 export class AdminUsers implements OnInit {
 
     private readonly adminUserService = inject(AdminUserService);
+    private readonly authStorageService = inject(AuthStorageService);
     private readonly destroyRef = inject(DestroyRef);
 
     readonly UserRole = UserRole;
@@ -36,6 +39,12 @@ export class AdminUsers implements OnInit {
     readonly searchTerm = signal('');
     readonly roleFilter = signal<RoleFilter>('ALL');
     readonly statusFilter = signal<StatusFilter>('ALL');
+
+    readonly userActionId = signal<number | null>(null);
+    readonly actionError = signal<string | null>(null);
+    readonly actionSuccess = signal<string | null>(null);
+
+    readonly currentUserId = this.authStorageService.getSession()?.userId ?? null;
 
     readonly volunteerCount = computed(() => {
         return this.users().filter(
@@ -199,18 +208,78 @@ export class AdminUsers implements OnInit {
         return `${nameInitial}${surnameInitial}`;
     }
 
+    isCurrentUser(user: AdminUser): boolean {
+        return user.id === this.currentUserId;
+    }
+
+    isUserActionLoading(userId: number): boolean {
+        return this.userActionId() === userId;
+    }
+
+    isAnyUserActionLoading(): boolean {
+        return this.userActionId() !== null;
+    }
+
+    deactivateUser(user: AdminUser): void {
+        if (!user.active) {
+            return;
+        }
+
+        if (this.isCurrentUser(user)) {
+            this.actionError.set(
+                'No puedes desactivar tu propia cuenta de administrador.'
+            );
+
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `¿Seguro que quieres desactivar la cuenta de "${user.name} ${user.surname}"?`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        this.changeActiveStatus(
+            user,
+            false
+        );
+    }
+
+    reactivateUser(user: AdminUser): void {
+        if (user.active) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `¿Quieres reactivar la cuenta de "${user.name} ${user.surname}"?`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        this.changeActiveStatus(
+            user,
+            true
+        );
+    }
+
     private loadUsers(): void {
         this.loading.set(true);
         this.errorMessage.set(null);
 
         this.adminUserService.getUsers()
             .pipe(
+                finalize(() => {
+                    this.loading.set(false);
+                }),
                 takeUntilDestroyed(this.destroyRef)
             )
             .subscribe({
                 next: users => {
                     this.users.set(users);
-                    this.loading.set(false);
                 },
                 error: (error: HttpErrorResponse) => {
                     console.error(
@@ -218,12 +287,101 @@ export class AdminUsers implements OnInit {
                         error
                     );
 
-                    this.loading.set(false);
-
                     this.errorMessage.set(
                         'No se ha podido cargar la gestión de usuarios.'
                     );
                 }
             });
+    }
+
+    private changeActiveStatus(
+        user: AdminUser,
+        active: boolean
+    ): void {
+        if (this.isAnyUserActionLoading()) {
+            return;
+        }
+
+        this.userActionId.set(user.id);
+        this.actionError.set(null);
+        this.actionSuccess.set(null);
+
+        this.adminUserService.updateActiveStatus(
+            user.id,
+            active
+        )
+            .pipe(
+                finalize(() => {
+                    this.userActionId.set(null);
+                }),
+                takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe({
+                next: updatedUser => {
+                    this.users.update(
+                        current =>
+                            current.map(
+                                item =>
+                                    item.id === updatedUser.id
+                                        ? updatedUser
+                                        : item
+                            )
+                    );
+
+                    if (active) {
+                        this.actionSuccess.set(
+                            `La cuenta de ${updatedUser.name} ${updatedUser.surname} se ha reactivado correctamente.`
+                        );
+                    } else {
+                        this.actionSuccess.set(
+                            `La cuenta de ${updatedUser.name} ${updatedUser.surname} se ha desactivado correctamente.`
+                        );
+                    }
+                },
+                error: (error: HttpErrorResponse) => {
+                    console.error(
+                        'Error modificando el estado del usuario:',
+                        error
+                    );
+
+                    this.actionError.set(
+                        this.getActiveStatusErrorMessage(error)
+                    );
+                }
+            });
+    }
+
+    private getActiveStatusErrorMessage(
+        error: HttpErrorResponse
+    ): string {
+        if (error.status === 0) {
+            return 'No se puede conectar con el servidor.';
+        }
+
+        if (typeof error.error?.detail === 'string') {
+            return error.error.detail;
+        }
+
+        if (typeof error.error?.message === 'string') {
+            return error.error.message;
+        }
+
+        if (error.status === 400) {
+            return 'No se puede modificar el estado de la cuenta.';
+        }
+
+        if (error.status === 403) {
+            return 'No tienes permiso para modificar esta cuenta.';
+        }
+
+        if (error.status === 404) {
+            return 'El usuario indicado no existe.';
+        }
+
+        if (error.status === 409) {
+            return 'No puedes desactivar tu propia cuenta de administrador.';
+        }
+
+        return 'No se ha podido modificar el estado de la cuenta.';
     }
 }
