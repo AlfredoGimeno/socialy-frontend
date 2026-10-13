@@ -1,0 +1,543 @@
+<section class="projects-page">
+
+    <div class="projects-container">
+
+        <a
+            routerLink="/admin"
+            class="back-link"
+        >
+            ← Volver a Administración
+        </a>
+
+        @if (loading()) {
+
+            <div class="state-card">
+
+                <div class="loader"></div>
+
+                <p>
+                    Cargando proyectos...
+                </p>
+
+            </div>
+
+        } @else if (errorMessage()) {
+
+            <div class="state-card error">
+
+                <h2>
+                    No se pueden cargar los proyectos
+                </h2>
+
+                <p>
+                    {{ errorMessage() }}
+                </p>
+
+            </div>
+
+        } @else {
+
+            <header class="projects-header">
+
+                <div>
+
+                    <span class="header-label">
+                        Administración
+                    </span>
+
+                    <h1>
+                        Proyectos
+                    </h1>
+
+                    <p>
+                        Supervisa todos los proyectos publicados por las organizaciones registradas en Socialy.
+                    </p>
+
+                </div>
+
+            </header>
+
+            <section class="summary-grid">
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ projects().length }}
+                    </span>
+
+                    <strong>
+                        Proyectos
+                    </strong>
+
+                    <small>
+                        Total registrados
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ openProjects().length }}
+                    </span>
+
+                    <strong>
+                        Abiertos
+                    </strong>
+
+                    <small>
+                        Admiten solicitudes
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ finishedProjects().length }}
+                    </span>
+
+                    <strong>
+                        Finalizados
+                    </strong>
+
+                    <small>
+                        Proyectos terminados
+                    </small>
+
+                </article>
+
+                <article class="summary-card">
+
+                    <span class="summary-value">
+                        {{ cancelledProjects().length }}
+                    </span>
+
+                    <strong>
+                        Cancelados
+                    </strong>
+
+                    <small>
+                        Proyectos cancelados
+                    </small>
+
+                </article>
+
+            </section>
+
+            @if (actionError()) {
+
+                <div
+                    class="message error-message"
+                    role="alert"
+                >
+                    {{ actionError() }}
+                </div>
+
+            }
+
+            @if (actionSuccess()) {
+
+                <div
+                    class="message success-message"
+                    role="status"
+                >
+                    {{ actionSuccess() }}
+                </div>
+
+            }
+
+            <section class="projects-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            Supervisión global
+                        </span>
+
+                        <h2>
+                            Todos los proyectos
+                        </h2>
+
+                        <p>
+                            Busca y filtra proyectos independientemente de la organización propietaria.
+                        </p>
+
+                    </div>
+
+                    <span class="results-count">
+                        {{ filteredProjects().length }}
+                    </span>
+
+                </div>
+
+                <div class="filters">
+
+                    <div class="search-field">
+
+                        <label for="projectSearch">
+                            Buscar
+                        </label>
+
+                        <input
+                            id="projectSearch"
+                            type="search"
+                            placeholder="Título, organización, ciudad..."
+                            [ngModel]="searchTerm()"
+                            (ngModelChange)="onSearchChange($event)"
+                        >
+
+                    </div>
+
+                    <div class="filter-field">
+
+                        <label for="projectStatus">
+                            Estado
+                        </label>
+
+                        <select
+                            id="projectStatus"
+                            [ngModel]="statusFilter()"
+                            (ngModelChange)="onStatusFilterChange($event)"
+                        >
+
+                            <option [ngValue]="null">
+                                Todos
+                            </option>
+
+                            <option [ngValue]="ProjectStatus.OPEN">
+                                Abiertos
+                            </option>
+
+                            <option [ngValue]="ProjectStatus.CLOSED">
+                                Cerrados
+                            </option>
+
+                            <option [ngValue]="ProjectStatus.FINISHED">
+                                Finalizados
+                            </option>
+
+                            <option [ngValue]="ProjectStatus.CANCELLED">
+                                Cancelados
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="filter-field">
+
+                        <label for="projectCategory">
+                            Categoría
+                        </label>
+
+                        <select
+                            id="projectCategory"
+                            [ngModel]="categoryFilter()"
+                            (ngModelChange)="onCategoryFilterChange($event)"
+                        >
+
+                            <option [ngValue]="null">
+                                Todas
+                            </option>
+
+                            @for (
+                                category of categories();
+                                track category.id
+                            ) {
+
+                                <option [ngValue]="category.id">
+                                    {{ category.name }}
+                                </option>
+
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="filter-field">
+
+                        <label for="projectOrganization">
+                            Organización
+                        </label>
+
+                        <select
+                            id="projectOrganization"
+                            [ngModel]="organizationFilter()"
+                            (ngModelChange)="onOrganizationFilterChange($event)"
+                        >
+
+                            <option [ngValue]="null">
+                                Todas
+                            </option>
+
+                            @for (
+                                organization of organizations();
+                                track organization.id
+                            ) {
+
+                                <option [ngValue]="organization.id">
+                                    {{ organization.name }}
+                                </option>
+
+                            }
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="filter-summary">
+
+                    <span>
+                        Mostrando
+                        <strong>
+                            {{ filteredProjects().length }}
+                        </strong>
+                        de
+                        <strong>
+                            {{ projects().length }}
+                        </strong>
+                        proyectos
+                    </span>
+
+                    <span>
+                        Cerrados:
+                        <strong>
+                            {{ closedProjects().length }}
+                        </strong>
+                    </span>
+
+                    @if (hasActiveFilters()) {
+
+                        <button
+                            type="button"
+                            class="clear-button"
+                            (click)="clearFilters()"
+                        >
+                            Limpiar filtros
+                        </button>
+
+                    }
+
+                </div>
+
+                @if (filteredProjects().length === 0) {
+
+                    <div class="empty-state">
+
+                        <h3>
+                            No se han encontrado proyectos
+                        </h3>
+
+                        <p>
+                            Prueba a cambiar los filtros o el texto de búsqueda.
+                        </p>
+
+                        @if (hasActiveFilters()) {
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                (click)="clearFilters()"
+                            >
+                                Mostrar todos
+                            </button>
+
+                        }
+
+                    </div>
+
+                } @else {
+
+                    <div class="projects-list">
+
+                        @for (
+                            project of filteredProjects();
+                            track project.id
+                        ) {
+
+                            <article class="project-card">
+
+                                <div class="project-card-header">
+
+                                    <div>
+
+                                        <div class="project-badges">
+
+                                            <span
+                                                class="status-badge"
+                                                [class.open]="project.status === ProjectStatus.OPEN"
+                                                [class.closed]="project.status === ProjectStatus.CLOSED"
+                                                [class.finished]="project.status === ProjectStatus.FINISHED"
+                                                [class.cancelled]="project.status === ProjectStatus.CANCELLED"
+                                            >
+                                                {{ statusLabel(project.status) }}
+                                            </span>
+
+                                            @if (project.category) {
+
+                                                <span class="category-badge">
+                                                    {{ project.category.name }}
+                                                </span>
+
+                                            }
+
+                                        </div>
+
+                                        <h3>
+                                            {{ project.title }}
+                                        </h3>
+
+                                        <p class="organization-name">
+                                            {{ project.organization.name }}
+                                        </p>
+
+                                    </div>
+
+                                    <span class="project-id">
+                                        #{{ project.id }}
+                                    </span>
+
+                                </div>
+
+                                <p class="project-description">
+                                    {{ project.description }}
+                                </p>
+
+                                <div class="project-meta">
+
+                                    <div>
+
+                                        <span>
+                                            Ubicación
+                                        </span>
+
+                                        <strong>
+                                            {{ projectLocation(project) }}
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>
+                                            Inicio
+                                        </span>
+
+                                        <strong>
+                                            {{
+                                                project.startDate
+                                                    | date:'dd/MM/yyyy'
+                                            }}
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>
+                                            Fin
+                                        </span>
+
+                                        <strong>
+                                            {{
+                                                project.endDate
+                                                    | date:'dd/MM/yyyy'
+                                            }}
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>
+                                            Máx. voluntarios
+                                        </span>
+
+                                        <strong>
+                                            @if (project.maxVolunteers !== null) {
+                                                {{ project.maxVolunteers }}
+                                            } @else {
+                                                Sin límite
+                                            }
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>
+                                            Creado
+                                        </span>
+
+                                        <strong>
+                                            {{
+                                                project.createdAt
+                                                    | date:'dd/MM/yyyy'
+                                            }}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="project-actions">
+
+                                    <a
+                                        [routerLink]="[
+                                            '/projects',
+                                            project.id
+                                        ]"
+                                        class="view-button"
+                                    >
+                                        Ver proyecto
+                                    </a>
+
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/projects',
+                                            project.id,
+                                            'edit'
+                                        ]"
+                                        class="edit-button"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <button
+                                        type="button"
+                                        class="delete-button"
+                                        [disabled]="deletingProjectId() !== null"
+                                        (click)="deleteProject(project)"
+                                    >
+
+                                        @if (isDeleting(project.id)) {
+                                            Eliminando...
+                                        } @else {
+                                            Eliminar
+                                        }
+
+                                    </button>
+
+                                </div>
+
+                            </article>
+
+                        }
+
+                    </div>
+
+                }
+
+            </section>
+
+        }
+
+    </div>
+
+</section>

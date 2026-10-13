@@ -175,6 +175,38 @@ export const routes: Routes = [
                     )
             },
             {
+                path: 'admin/projects',
+                canActivate: [
+                    authGuard,
+                    roleGuard
+                ],
+                data: {
+                    roles: [
+                        UserRole.ADMIN
+                    ]
+                },
+                loadComponent: () =>
+                    import('./features/admin/admin-projects/admin-projects').then(
+                        module => module.AdminProjects
+                    )
+            },
+            {
+                path: 'admin/projects/:id/edit',
+                canActivate: [
+                    authGuard,
+                    roleGuard
+                ],
+                data: {
+                    roles: [
+                        UserRole.ADMIN
+                    ]
+                },
+                loadComponent: () =>
+                    import('./features/admin/admin-project-edit/admin-project-edit').then(
+                        module => module.AdminProjectEdit
+                    )
+            },
+            {
                 path: 'admin',
                 canActivate: [
                     authGuard,

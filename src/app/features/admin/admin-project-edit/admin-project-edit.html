@@ -1,0 +1,435 @@
+<section class="edit-page">
+
+    <div class="edit-container">
+
+        <a
+            routerLink="/admin/projects"
+            class="back-link"
+        >
+            ← Volver a proyectos
+        </a>
+
+        @if (loading()) {
+
+            <div class="state-card">
+
+                <div class="loader"></div>
+
+                <p>
+                    Cargando proyecto...
+                </p>
+
+            </div>
+
+        } @else if (errorMessage()) {
+
+            <div class="state-card error">
+
+                <h2>
+                    No se puede editar el proyecto
+                </h2>
+
+                <p>
+                    {{ errorMessage() }}
+                </p>
+
+            </div>
+
+        } @else if (project()) {
+
+            <header class="edit-header">
+
+                <div>
+
+                    <span class="header-label">
+                        Administración
+                    </span>
+
+                    <h1>
+                        Editar proyecto
+                    </h1>
+
+                    <p>
+                        Como administrador puedes modificar cualquier proyecto registrado en Socialy.
+                    </p>
+
+                </div>
+
+                <div class="organization-box">
+
+                    <span>
+                        Organización propietaria
+                    </span>
+
+                    <strong>
+                        {{ project()!.organization.name }}
+                    </strong>
+
+                    <small>
+                        ID #{{ project()!.organization.id }}
+                    </small>
+
+                </div>
+
+            </header>
+
+            @if (saveError()) {
+
+                <div
+                    class="message error-message"
+                    role="alert"
+                >
+                    {{ saveError() }}
+                </div>
+
+            }
+
+            <form
+                [formGroup]="projectForm"
+                (ngSubmit)="saveProject()"
+                novalidate
+            >
+
+                <section class="form-card">
+
+                    <div class="section-heading">
+
+                        <span class="section-label">
+                            Información principal
+                        </span>
+
+                        <h2>
+                            Datos del proyecto
+                        </h2>
+
+                    </div>
+
+                    <div class="form-group full-width">
+
+                        <label for="title">
+                            Título *
+                        </label>
+
+                        <input
+                            id="title"
+                            type="text"
+                            formControlName="title"
+                            maxlength="150"
+                        >
+
+                        @if (
+                            projectForm.controls.title.touched &&
+                            projectForm.controls.title.hasError('required')
+                        ) {
+
+                            <span class="field-error">
+                                El título es obligatorio.
+                            </span>
+
+                        }
+
+                    </div>
+
+                    <div class="form-group full-width">
+
+                        <label for="description">
+                            Descripción *
+                        </label>
+
+                        <textarea
+                            id="description"
+                            formControlName="description"
+                            rows="7"
+                        ></textarea>
+
+                        @if (
+                            projectForm.controls.description.touched &&
+                            projectForm.controls.description.hasError('required')
+                        ) {
+
+                            <span class="field-error">
+                                La descripción es obligatoria.
+                            </span>
+
+                        }
+
+                    </div>
+
+                    <div class="form-group full-width">
+
+                        <label for="requirements">
+                            Requisitos
+                        </label>
+
+                        <textarea
+                            id="requirements"
+                            formControlName="requirements"
+                            rows="4"
+                        ></textarea>
+
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+
+                            <label for="categoryId">
+                                Categoría *
+                            </label>
+
+                            <select
+                                id="categoryId"
+                                formControlName="categoryId"
+                            >
+
+                                <option [ngValue]="null">
+                                    Selecciona una categoría
+                                </option>
+
+                                @for (
+                                    category of categories();
+                                    track category.id
+                                ) {
+
+                                    <option [ngValue]="category.id">
+                                        {{ category.name }}
+                                    </option>
+
+                                }
+
+                            </select>
+
+                            @if (
+                                projectForm.controls.categoryId.touched &&
+                                projectForm.controls.categoryId.hasError('required')
+                            ) {
+
+                                <span class="field-error">
+                                    La categoría es obligatoria.
+                                </span>
+
+                            }
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="status">
+                                Estado *
+                            </label>
+
+                            <select
+                                id="status"
+                                formControlName="status"
+                            >
+
+                                <option [ngValue]="ProjectStatus.OPEN">
+                                    Abierto
+                                </option>
+
+                                <option [ngValue]="ProjectStatus.CLOSED">
+                                    Cerrado
+                                </option>
+
+                                <option [ngValue]="ProjectStatus.FINISHED">
+                                    Finalizado
+                                </option>
+
+                                <option [ngValue]="ProjectStatus.CANCELLED">
+                                    Cancelado
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="form-card">
+
+                    <div class="section-heading">
+
+                        <span class="section-label">
+                            Localización
+                        </span>
+
+                        <h2>
+                            Lugar del proyecto
+                        </h2>
+
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div class="form-group full-grid">
+
+                            <label for="location">
+                                Lugar
+                            </label>
+
+                            <input
+                                id="location"
+                                type="text"
+                                formControlName="location"
+                                placeholder="Ej. Parque Natural del Turia"
+                            >
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="city">
+                                Ciudad
+                            </label>
+
+                            <input
+                                id="city"
+                                type="text"
+                                formControlName="city"
+                            >
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="province">
+                                Provincia
+                            </label>
+
+                            <input
+                                id="province"
+                                type="text"
+                                formControlName="province"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="form-card">
+
+                    <div class="section-heading">
+
+                        <span class="section-label">
+                            Planificación
+                        </span>
+
+                        <h2>
+                            Fechas y capacidad
+                        </h2>
+
+                    </div>
+
+                    <div class="form-grid three-columns">
+
+                        <div class="form-group">
+
+                            <label for="startDate">
+                                Fecha de inicio *
+                            </label>
+
+                            <input
+                                id="startDate"
+                                type="date"
+                                formControlName="startDate"
+                            >
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="endDate">
+                                Fecha de fin *
+                            </label>
+
+                            <input
+                                id="endDate"
+                                type="date"
+                                formControlName="endDate"
+                            >
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="maxVolunteers">
+                                Máximo de voluntarios
+                            </label>
+
+                            <input
+                                id="maxVolunteers"
+                                type="number"
+                                min="1"
+                                formControlName="maxVolunteers"
+                                placeholder="Sin límite"
+                            >
+
+                            @if (
+                                projectForm.controls.maxVolunteers.touched &&
+                                projectForm.controls.maxVolunteers.hasError('min')
+                            ) {
+
+                                <span class="field-error">
+                                    Debe ser al menos 1.
+                                </span>
+
+                            }
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="admin-warning">
+
+                    <strong>
+                        Modificación administrativa
+                    </strong>
+
+                    <p>
+                        Los cambios se aplicarán directamente al proyecto de
+                        <strong>
+                            {{ project()!.organization.name }}
+                        </strong>.
+                        La organización propietaria seguirá siendo la misma.
+                    </p>
+
+                </section>
+
+                <div class="form-actions">
+
+                    <a
+                        routerLink="/admin/projects"
+                        class="cancel-button"
+                    >
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="save-button"
+                        [disabled]="saving()"
+                    >
+
+                        @if (saving()) {
+                            Guardando...
+                        } @else {
+                            Guardar cambios
+                        }
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        }
+
+    </div>
+
+</section>
