@@ -31,9 +31,13 @@
 
           @if (session(); as currentSession) {
 
-            <span class="user-name">
+            <a
+              routerLink="/profile"
+              routerLinkActive="active"
+              class="user-name"
+            >
               {{ currentSession.name }}
-            </span>
+            </a>
 
             <a
               [routerLink]="dashboardRoute()"

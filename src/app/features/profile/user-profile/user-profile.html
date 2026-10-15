@@ -1,0 +1,299 @@
+<section class="profile-page">
+
+    <div class="profile-container">
+
+        @if (loading()) {
+
+            <div class="state-card">
+
+                <div class="loader"></div>
+
+                <p>
+                    Cargando perfil...
+                </p>
+
+            </div>
+
+        } @else if (errorMessage()) {
+
+            <div class="state-card error">
+
+                <h2>
+                    No se puede cargar el perfil
+                </h2>
+
+                <p>
+                    {{ errorMessage() }}
+                </p>
+
+            </div>
+
+        } @else if (profile()) {
+
+            <a
+                [routerLink]="homeRoute()"
+                class="back-link"
+            >
+                ← Volver a mi área
+            </a>
+
+            <header class="profile-header">
+
+                <div class="profile-avatar">
+                    {{ initials() }}
+                </div>
+
+                <div class="profile-header-content">
+
+                    <span class="header-label">
+                        Mi cuenta
+                    </span>
+
+                    <h1>
+                        {{ profile()!.name }}
+                        {{ profile()!.surname }}
+                    </h1>
+
+                    <p>
+                        Gestiona tus datos personales de Socialy.
+                    </p>
+
+                </div>
+
+                <span
+                    class="role-badge"
+                    [class.volunteer]="profile()!.role === UserRole.VOLUNTEER"
+                    [class.organization]="profile()!.role === UserRole.ORGANIZATION"
+                    [class.admin]="profile()!.role === UserRole.ADMIN"
+                >
+                    {{ roleLabel(profile()!.role) }}
+                </span>
+
+            </header>
+
+            @if (saveError()) {
+
+                <div
+                    class="message error-message"
+                    role="alert"
+                >
+                    {{ saveError() }}
+                </div>
+
+            }
+
+            @if (saveSuccess()) {
+
+                <div
+                    class="message success-message"
+                    role="status"
+                >
+                    {{ saveSuccess() }}
+                </div>
+
+            }
+
+            <div class="profile-layout">
+
+                <main class="profile-main">
+
+                    <section class="profile-card">
+
+                        <div class="section-heading">
+
+                            <span class="section-label">
+                                Datos personales
+                            </span>
+
+                            <h2>
+                                Información editable
+                            </h2>
+
+                            <p>
+                                Puedes modificar tu nombre, apellidos y teléfono.
+                            </p>
+
+                        </div>
+
+                        <form
+                            [formGroup]="profileForm"
+                            (ngSubmit)="saveProfile()"
+                            novalidate
+                        >
+
+                            <div class="form-grid">
+
+                                <div class="form-group">
+
+                                    <label for="profileName">
+                                        Nombre *
+                                    </label>
+
+                                    <input
+                                        id="profileName"
+                                        type="text"
+                                        formControlName="name"
+                                    >
+
+                                    @if (
+                                        profileForm.controls.name.touched &&
+                                        profileForm.controls.name.hasError('required')
+                                    ) {
+
+                                        <span class="field-error">
+                                            El nombre es obligatorio.
+                                        </span>
+
+                                    }
+
+                                </div>
+
+                                <div class="form-group">
+
+                                    <label for="profileSurname">
+                                        Apellidos *
+                                    </label>
+
+                                    <input
+                                        id="profileSurname"
+                                        type="text"
+                                        formControlName="surname"
+                                    >
+
+                                    @if (
+                                        profileForm.controls.surname.touched &&
+                                        profileForm.controls.surname.hasError('required')
+                                    ) {
+
+                                        <span class="field-error">
+                                            Los apellidos son obligatorios.
+                                        </span>
+
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="profilePhone">
+                                    Teléfono
+                                </label>
+
+                                <input
+                                    id="profilePhone"
+                                    type="tel"
+                                    formControlName="phone"
+                                    placeholder="Ej. 600 123 456"
+                                >
+
+                            </div>
+
+                            <div class="form-actions">
+
+                                <button
+                                    type="submit"
+                                    class="save-button"
+                                    [disabled]="saving()"
+                                >
+
+                                    @if (saving()) {
+                                        Guardando...
+                                    } @else {
+                                        Guardar cambios
+                                    }
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </section>
+
+                </main>
+
+                <aside class="profile-sidebar">
+
+                    <section class="profile-card">
+
+                        <span class="section-label">
+                            Cuenta
+                        </span>
+
+                        <h2>
+                            Datos protegidos
+                        </h2>
+
+                        <div class="protected-list">
+
+                            <div>
+
+                                <span>
+                                    Correo electrónico
+                                </span>
+
+                                <strong>
+                                    {{ profile()!.email }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Rol
+                                </span>
+
+                                <strong>
+                                    {{ roleLabel(profile()!.role) }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Estado
+                                </span>
+
+                                <strong>
+                                    @if (profile()!.active) {
+                                        Cuenta activa
+                                    } @else {
+                                        Cuenta inactiva
+                                    }
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Identificador
+                                </span>
+
+                                <strong>
+                                    #{{ profile()!.id }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <p class="protected-help">
+                            Estos datos no pueden modificarse desde el perfil.
+                        </p>
+
+                    </section>
+
+                </aside>
+
+            </div>
+
+        }
+
+    </div>
+
+</section>
